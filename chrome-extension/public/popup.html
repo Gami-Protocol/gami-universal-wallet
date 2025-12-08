@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gami Wallet</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <!-- Header -->
+    <div class="header">
+      <h1 class="title">GAMI WALLET</h1>
+      <div class="address" id="userAddress">Not Connected</div>
+    </div>
+
+    <!-- XP Ring Section -->
+    <div class="xp-section">
+      <svg class="xp-ring" width="140" height="140" id="xpRingSVG">
+        <defs>
+          <linearGradient id="xpGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stop-color="#00FF94" />
+            <stop offset="50%" stop-color="#00D1FF" />
+            <stop offset="100%" stop-color="#FF00E5" />
+          </linearGradient>
+        </defs>
+        <circle cx="70" cy="70" r="60" stroke="#2A2A2A" stroke-width="8" fill="none" />
+        <circle 
+          id="progressCircle"
+          cx="70" 
+          cy="70" 
+          r="60" 
+          stroke="url(#xpGradient)" 
+          stroke-width="8" 
+          fill="none"
+          stroke-linecap="round"
+          stroke-dasharray="377"
+          stroke-dashoffset="377"
+          transform="rotate(-90 70 70)"
+        />
+      </svg>
+      <div class="xp-center">
+        <div class="level-label">LEVEL</div>
+        <div class="level-number" id="levelNumber">--</div>
+        <div class="xp-text">
+          <span id="currentXP">0</span>/<span id="maxXP">0</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card">
+        <div class="stat-label">TOTAL XP</div>
+        <div class="stat-value" id="totalXP">0</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">TODAY</div>
+        <div class="stat-value" id="todayXP">0</div>
+      </div>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="actions">
+      <button class="btn-primary" id="openWalletBtn">
+        Open Full Wallet
+      </button>
+      <button class="btn-secondary" id="syncBtn">
+        Sync Now
+      </button>
+    </div>
+
+    <!-- Settings -->
+    <div class="settings">
+      <label class="toggle-label">
+        <input type="checkbox" id="trackingToggle" checked>
+        <span>Enable Activity Tracking</span>
+      </label>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

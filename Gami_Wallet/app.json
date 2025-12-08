@@ -1,6 +1,8 @@
 {
   "expo": {
     "name": "Create mobile app",
+    "slug": "gami-wallet",
+    "scheme": "gamiwallet",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -39,14 +41,6 @@
         }
       ],
       "expo-audio",
-      [
-        "expo-build-properties",
-        {
-          "ios": {
-            "useFrameworks": "static"
-          }
-        }
-      ],
       "expo-video",
       "expo-secure-store",
       "expo-web-browser",

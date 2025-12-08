@@ -1,0 +1,17 @@
+{
+  "name": "gami-protocol-extension",
+  "version": "1.0.0",
+  "description": "Gami Protocol Universal Wallet & Engagement Tracker Chrome Extension",
+  "scripts": {
+    "build": "echo 'Extension files are ready in public/'",
+    "dev": "echo 'Load extension from chrome://extensions in developer mode'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "gami-protocol",
+    "wallet",
+    "engagement-tracker"
+  ],
+  "author": "Gami Protocol",
+  "license": "MIT"
+}
