@@ -1,22 +1,27 @@
 import React from 'react';
-import { Home, Gift, Target, Disc } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { Home, Wallet, Gift, Target, TrendingUp } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const tabs = [
   { key: 'home', label: 'Home', Icon: Home },
+  { key: 'wallet', label: 'Wallet', Icon: Wallet },
   { key: 'rewards', label: 'Rewards', Icon: Gift },
-  { key: 'points', label: 'Points', Icon: Target },
-  { key: 'wheels', label: 'Wheels', Icon: Disc },
+  { key: 'missions', label: 'Missions', Icon: Target },
+  { key: 'earn', label: 'Earn', Icon: TrendingUp },
 ];
 
-export const BottomNav = ({ activeTab, setActiveTab }) => {
+export default function BottomNav({ activeTab, setActiveTab }) {
   return (
     <nav
-      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50 glass"
-      style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingBottom: 'env(safe-area-inset-bottom, 8px)' }}
+      className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] z-50"
+      style={{
+        background: 'var(--gami-surface)',
+        borderTop: '3px solid var(--gami-border)',
+        paddingBottom: 'env(safe-area-inset-bottom, 4px)',
+      }}
       data-testid="bottom-nav"
     >
-      <div className="flex justify-around items-center h-16 px-2">
+      <div className="flex justify-around items-center h-16">
         {tabs.map(({ key, label, Icon }) => {
           const isActive = activeTab === key;
           return (
@@ -24,43 +29,32 @@ export const BottomNav = ({ activeTab, setActiveTab }) => {
               key={key}
               data-testid={`nav-${key}`}
               onClick={() => setActiveTab(key)}
-              className="relative flex flex-col items-center gap-0.5 py-1 px-4 rounded-xl group"
+              className="relative flex flex-col items-center gap-0.5 px-3 py-1"
               style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}
             >
-              <div className="relative">
-                <Icon
-                  size={22}
-                  strokeWidth={isActive ? 2.5 : 1.8}
-                  style={{ color: isActive ? '#6E3CFB' : 'var(--gami-text-muted)' }}
+              {isActive && (
+                <motion.div
+                  layoutId="tab-bg"
+                  className="absolute -top-[3px] left-1/2 -translate-x-1/2 w-8 h-[3px]"
+                  style={{ background: '#6E3CFB' }}
+                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
                 />
-                {isActive && (
-                  <motion.div
-                    layoutId="nav-glow"
-                    className="absolute -inset-2 rounded-full"
-                    style={{ background: 'radial-gradient(circle, rgba(110,60,251,0.25) 0%, transparent 70%)' }}
-                    transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                  />
-                )}
-              </div>
+              )}
+              <Icon
+                size={20}
+                strokeWidth={isActive ? 2.5 : 1.8}
+                style={{ color: isActive ? '#6E3CFB' : 'var(--gami-text-muted)' }}
+              />
               <span
-                className="text-[10px] font-semibold tracking-wide"
+                className="text-[9px] font-bold uppercase tracking-wider"
                 style={{ color: isActive ? '#6E3CFB' : 'var(--gami-text-muted)' }}
               >
                 {label}
               </span>
-              {isActive && (
-                <motion.div
-                  layoutId="nav-dot"
-                  className="absolute -bottom-0.5 w-1 h-1 rounded-full bg-gami-primary"
-                  transition={{ type: 'spring', stiffness: 400, damping: 30 }}
-                />
-              )}
             </button>
           );
         })}
       </div>
     </nav>
   );
-};
-
-export default BottomNav;
+}

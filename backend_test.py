@@ -214,6 +214,128 @@ class GamiWalletAPITester:
             return True
         return False
 
+    def test_get_tokens(self):
+        """Test get tokens endpoint"""
+        success, response = self.run_test(
+            "Get Tokens",
+            "GET",
+            "api/tokens",
+            200
+        )
+        if success and isinstance(response, list) and len(response) >= 5:
+            print(f"   Found {len(response)} tokens")
+            # Check for required fields
+            if response and 'balance' in response[0] and 'usd_value' in response[0]:
+                return True
+        return False
+
+    def test_get_nfts(self):
+        """Test get NFTs endpoint"""
+        success, response = self.run_test(
+            "Get NFTs",
+            "GET",
+            "api/nfts",
+            200
+        )
+        if success and isinstance(response, list) and len(response) >= 4:
+            print(f"   Found {len(response)} NFTs")
+            # Check for required fields
+            if response and 'name' in response[0] and 'rarity' in response[0]:
+                return True
+        return False
+
+    def test_get_networks(self):
+        """Test get networks endpoint"""
+        success, response = self.run_test(
+            "Get Networks",
+            "GET",
+            "api/networks",
+            200
+        )
+        if success and isinstance(response, list) and len(response) > 0:
+            print(f"   Found {len(response)} networks")
+            return True
+        return False
+
+    def test_get_pools(self):
+        """Test get staking pools endpoint"""
+        success, response = self.run_test(
+            "Get Staking Pools",
+            "GET",
+            "api/pools",
+            200
+        )
+        if success and isinstance(response, list) and len(response) >= 5:
+            print(f"   Found {len(response)} staking pools")
+            # Check for required fields
+            if response and 'apy' in response[0] and 'tvl' in response[0]:
+                return True
+        return False
+
+    def test_get_staking(self):
+        """Test get staking positions endpoint"""
+        success, response = self.run_test(
+            "Get Staking Positions",
+            "GET",
+            "api/staking",
+            200
+        )
+        if success and isinstance(response, list) and len(response) >= 2:
+            print(f"   Found {len(response)} active staking positions")
+            # Check for required fields
+            if response and 'usd_value' in response[0] and 'earned' in response[0]:
+                return True
+        return False
+
+    def test_get_transactions(self):
+        """Test get transactions endpoint"""
+        success, response = self.run_test(
+            "Get Transactions",
+            "GET",
+            "api/transactions",
+            200
+        )
+        if success and isinstance(response, list) and len(response) > 0:
+            print(f"   Found {len(response)} transactions")
+            return True
+        return False
+
+    def test_get_profile(self):
+        """Test get profile endpoint"""
+        success, response = self.run_test(
+            "Get Profile",
+            "GET",
+            "api/profile",
+            200
+        )
+        if success:
+            required_fields = ['username', 'wallet_address', 'level', 'connected_wallets', 'referral_code']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required profile field: {field}")
+                    return False
+            print(f"   Profile: {response.get('username')}, Level: {response.get('level')}")
+            return True
+        return False
+
+    def test_user_data_completeness(self):
+        """Test user endpoint has all required fields from requirements"""
+        success, response = self.run_test(
+            "Get User Data Completeness",
+            "GET",
+            "api/user",
+            200
+        )
+        if success:
+            required_fields = ['total_usd_balance', 'xp', 'staking_total_usd', 'connected_wallets']
+            for field in required_fields:
+                if field not in response:
+                    print(f"❌ Missing required user field: {field}")
+                    return False
+            print(f"   User Balance: ${response.get('total_usd_balance')}, Staking: ${response.get('staking_total_usd')}")
+            return True
+        return False
+
 def main():
     print("🚀 Starting Gami Wallet Backend API Testing...")
     tester = GamiWalletAPITester()
@@ -221,10 +343,18 @@ def main():
     # Run all tests
     tests = [
         tester.test_health_endpoint,
+        tester.test_user_data_completeness,
         tester.test_get_user,
+        tester.test_get_tokens,
+        tester.test_get_nfts,
+        tester.test_get_pools,
+        tester.test_get_staking,
+        tester.test_get_networks,
         tester.test_get_rewards,
         tester.test_get_missions,
         tester.test_get_checkins,
+        tester.test_get_transactions,
+        tester.test_get_profile,
         tester.test_daily_checkin,
         tester.test_spin_wheel,
         tester.test_reward_redemption,

@@ -1,129 +1,77 @@
 import React, { useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 import { useApp } from '../context/AppContext';
-import { ChevronLeft, ChevronRight, Flame, Award, Zap } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Flame } from 'lucide-react';
 
-const container = {
-  hidden: {},
-  show: { transition: { staggerChildren: 0.04 } },
-};
-const item = {
-  hidden: { opacity: 0, y: 10 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.25 } },
-};
-
+const anim = { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0 } };
+const stagger = { hidden: {}, show: { transition: { staggerChildren: 0.04 } } };
 const milestones = [125, 150, 175, 200];
 
 export default function CheckInScreen({ onBack }) {
   const { user, checkins, doCheckin } = useApp();
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const [checkingIn, setCheckingIn] = useState(false);
+  const [month, setMonth] = useState(new Date());
+  const [busy, setBusy] = useState(false);
   const [toast, setToast] = useState(null);
 
-  const checkinDates = new Set(checkins.map(c => c.date));
-
-  const year = currentMonth.getFullYear();
-  const month = currentMonth.getMonth();
-  const monthName = currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' });
-  const firstDay = new Date(year, month, 1);
-  const lastDay = new Date(year, month + 1, 0);
-  const daysInMonth = lastDay.getDate();
-  const startDow = firstDay.getDay() === 0 ? 6 : firstDay.getDay() - 1; // Monday start
-
-  const prevMonth = () => setCurrentMonth(new Date(year, month - 1, 1));
-  const nextMonth = () => setCurrentMonth(new Date(year, month + 1, 1));
+  const dates = new Set(checkins.map(c => c.date));
+  const y = month.getFullYear(), m = month.getMonth();
+  const label = month.toLocaleString('default', { month: 'long', year: 'numeric' });
+  const days = new Date(y, m + 1, 0).getDate();
+  const startDow = new Date(y, m, 1).getDay();
+  const today = new Date().toISOString().split('T')[0];
+  const checked = dates.has(today);
 
   const handleCheckin = useCallback(async () => {
-    setCheckingIn(true);
-    const result = await doCheckin();
-    setCheckingIn(false);
-    if (result.success) {
-      setToast({ message: `Checked in! +${result.xp_earned} XP`, type: 'success' });
-    } else {
-      setToast({ message: result.message || 'Already checked in today', type: 'info' });
-    }
+    setBusy(true);
+    const r = await doCheckin();
+    setBusy(false);
+    setToast({ msg: r.success ? `+${r.xp_earned} XP` : (r.message || 'Already done'), ok: r.success });
     setTimeout(() => setToast(null), 2500);
   }, [doCheckin]);
 
-  const today = new Date().toISOString().split('T')[0];
-  const todayChecked = checkinDates.has(today);
-
   return (
-    <motion.div
-      className="px-5 pt-6 pb-4 space-y-5"
-      variants={container}
-      initial="hidden"
-      animate="show"
-      data-testid="checkin-screen"
-    >
-      {/* Header */}
-      <motion.div variants={item} className="flex items-center gap-3">
-        <button
-          data-testid="back-btn"
-          onClick={onBack}
-          className="w-9 h-9 rounded-xl flex items-center justify-center"
-          style={{ background: 'rgba(255,255,255,0.06)', border: '1px solid rgba(255,255,255,0.08)', cursor: 'pointer' }}
-        >
-          <ChevronLeft size={18} style={{ color: 'var(--gami-text)' }} />
+    <motion.div className="px-4 pt-5 pb-4 space-y-5" variants={stagger} initial="hidden" animate="show" data-testid="checkin-screen">
+      <motion.div variants={anim} className="flex items-center gap-3">
+        <button data-testid="back-btn" onClick={onBack} className="w-8 h-8 flex items-center justify-center" style={{ background: 'var(--gami-card)', border: '2px solid var(--gami-border)', boxShadow: '2px 2px 0px var(--gami-deep)', cursor: 'pointer' }}>
+          <ChevronLeft size={16} style={{ color: 'var(--gami-text)' }} />
         </button>
-        <h2 className="text-lg font-bold" style={{ color: 'var(--gami-text)' }}>Daily Check-In</h2>
+        <h2 className="text-lg font-black uppercase" style={{ color: 'var(--gami-text)' }}>Daily Check-In</h2>
       </motion.div>
 
-      {/* Streak Counter */}
-      <motion.div variants={item} className="text-center py-4">
-        <h1 className="text-6xl font-extrabold tracking-tighter gradient-text" data-testid="streak-count">
-          {user?.streak_days || 0}
-        </h1>
-        <p className="text-xs mt-1" style={{ color: 'var(--gami-text-muted)' }}>Days in a row</p>
-        <div className="flex items-center justify-center gap-2 mt-3">
-          <Flame size={14} style={{ color: '#F59E0B' }} />
-          <p className="text-xs" style={{ color: 'var(--gami-text-muted)' }}>
-            You managed to maintain the Perfect Streak for {Math.floor((user?.streak_days || 0) / 7)} weeks.
-          </p>
+      <motion.div variants={anim} className="text-center py-3">
+        <h1 className="text-5xl font-black font-mono gradient-text" data-testid="streak-count">{user?.streak_days || 0}</h1>
+        <p className="text-[10px] font-bold uppercase tracking-wider mt-1" style={{ color: 'var(--gami-text-muted)' }}>Days in a row</p>
+        <div className="flex items-center justify-center gap-2 mt-2">
+          <Flame size={12} color="#F59E0B" />
+          <span className="text-[10px]" style={{ color: 'var(--gami-text-muted)' }}>Perfect Streak for {Math.floor((user?.streak_days || 0) / 7)} weeks</span>
         </div>
       </motion.div>
 
-      {/* Calendar */}
-      <motion.div variants={item} className="glass-card p-4" data-testid="streak-calendar">
-        <div className="flex items-center justify-between mb-4">
-          <button onClick={prevMonth} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <ChevronLeft size={18} style={{ color: 'var(--gami-text-muted)' }} />
-          </button>
-          <span className="text-sm font-bold" style={{ color: 'var(--gami-text)' }}>{monthName}</span>
-          <button onClick={nextMonth} style={{ background: 'none', border: 'none', cursor: 'pointer' }}>
-            <ChevronRight size={18} style={{ color: 'var(--gami-text-muted)' }} />
-          </button>
+      <motion.div variants={anim} className="neo-card p-4" data-testid="streak-calendar">
+        <div className="flex items-center justify-between mb-3">
+          <button onClick={() => setMonth(new Date(y, m - 1, 1))} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><ChevronLeft size={16} style={{ color: 'var(--gami-text-muted)' }} /></button>
+          <span className="text-xs font-black uppercase" style={{ color: 'var(--gami-text)' }}>{label}</span>
+          <button onClick={() => setMonth(new Date(y, m + 1, 1))} style={{ background: 'none', border: 'none', cursor: 'pointer' }}><ChevronRight size={16} style={{ color: 'var(--gami-text-muted)' }} /></button>
         </div>
-
-        {/* Day headers */}
         <div className="grid grid-cols-7 gap-1 mb-2">
           {['S', 'M', 'T', 'W', 'T', 'F', 'S'].map((d, i) => (
-            <div key={i} className="text-center text-[10px] font-semibold" style={{ color: 'var(--gami-text-muted)' }}>{d}</div>
+            <div key={i} className="text-center text-[9px] font-bold" style={{ color: 'var(--gami-text-muted)' }}>{d}</div>
           ))}
         </div>
-
-        {/* Calendar grid */}
         <div className="grid grid-cols-7 gap-1">
-          {/* Empty cells for offset (Sunday start) */}
-          {Array.from({ length: firstDay.getDay() }, (_, i) => (
-            <div key={`empty-${i}`} />
-          ))}
-          {Array.from({ length: daysInMonth }, (_, i) => {
+          {Array.from({ length: startDow }, (_, i) => <div key={`e-${i}`} />)}
+          {Array.from({ length: days }, (_, i) => {
             const day = i + 1;
-            const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-            const isChecked = checkinDates.has(dateStr);
-            const isToday = dateStr === today;
-
+            const ds = `${y}-${String(m + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+            const isChecked = dates.has(ds);
+            const isToday = ds === today;
             return (
-              <div
-                key={day}
-                className="w-full aspect-square flex items-center justify-center rounded-lg text-xs font-bold"
+              <div key={day} className="w-full aspect-square flex items-center justify-center text-[10px] font-bold"
                 style={{
-                  background: isChecked ? 'linear-gradient(135deg, #22C55E, #16A34A)' : isToday ? 'rgba(110,60,251,0.15)' : 'transparent',
-                  color: isChecked ? '#fff' : isToday ? '#A78BFA' : 'var(--gami-text-muted)',
-                  border: isToday && !isChecked ? '1px solid rgba(110,60,251,0.3)' : 'none',
-                }}
-              >
+                  background: isChecked ? '#22C55E' : isToday ? 'rgba(110,60,251,0.15)' : 'transparent',
+                  color: isChecked ? '#000' : isToday ? '#6E3CFB' : 'var(--gami-text-muted)',
+                  border: isToday && !isChecked ? '2px solid #6E3CFB' : isChecked ? '2px solid #16A34A' : '1px solid var(--gami-border-muted)',
+                }}>
                 {day}
               </div>
             );
@@ -131,23 +79,19 @@ export default function CheckInScreen({ onBack }) {
         </div>
       </motion.div>
 
-      {/* Target Milestones */}
-      <motion.div variants={item} data-testid="milestones">
-        <p className="text-xs font-semibold mb-2" style={{ color: 'var(--gami-text-muted)' }}>Target Sequence</p>
+      <motion.div variants={anim} data-testid="milestones">
+        <p className="text-[10px] font-black uppercase tracking-wider mb-2" style={{ color: 'var(--gami-text-muted)' }}>Target Sequence</p>
         <div className="flex gap-2">
           {milestones.map((ms, i) => {
             const reached = (user?.streak_days || 0) >= ms;
             return (
-              <div
-                key={i}
-                className="flex-1 py-2 rounded-xl text-center text-xs font-bold"
+              <div key={i} className="flex-1 py-2 text-center text-xs font-black" data-testid={`milestone-${ms}`}
                 style={{
-                  background: reached ? 'linear-gradient(135deg, #22C55E, #16A34A)' : 'rgba(255,255,255,0.04)',
-                  color: reached ? '#fff' : 'var(--gami-text-muted)',
-                  border: reached ? 'none' : '1px solid rgba(255,255,255,0.06)',
-                }}
-                data-testid={`milestone-${ms}`}
-              >
+                  background: reached ? '#22C55E' : 'var(--gami-card)',
+                  color: reached ? '#000' : 'var(--gami-text-muted)',
+                  border: reached ? '2px solid #16A34A' : '2px solid var(--gami-border-muted)',
+                  boxShadow: reached ? '3px 3px 0px #16A34A' : 'none',
+                }}>
                 {ms}
               </div>
             );
@@ -155,40 +99,19 @@ export default function CheckInScreen({ onBack }) {
         </div>
       </motion.div>
 
-      {/* Check-In Button */}
-      <motion.div variants={item}>
-        <button
-          data-testid="checkin-btn"
-          onClick={handleCheckin}
-          disabled={checkingIn || todayChecked}
-          className="w-full py-4 rounded-2xl text-sm font-bold"
-          style={{
-            background: todayChecked ? 'rgba(34,197,94,0.15)' : 'linear-gradient(135deg, #22C55E, #16A34A)',
-            color: todayChecked ? '#22C55E' : '#fff',
-            border: 'none',
-            cursor: todayChecked ? 'default' : 'pointer',
-            opacity: checkingIn ? 0.6 : 1,
-          }}
-        >
-          {todayChecked ? 'Checked In Today' : checkingIn ? 'Checking in...' : 'Check In'}
+      <motion.div variants={anim}>
+        <button data-testid="checkin-btn" onClick={handleCheckin} disabled={busy || checked}
+          className={checked ? 'neo-btn-outline w-full py-3.5 text-xs' : 'neo-btn-success w-full py-3.5 text-xs'}
+          style={{ opacity: busy ? 0.6 : 1, cursor: checked ? 'default' : 'pointer' }}>
+          {checked ? 'CHECKED IN TODAY' : busy ? 'CHECKING IN...' : 'CHECK IN'}
         </button>
       </motion.div>
 
-      {/* Toast */}
       {toast && (
-        <motion.div
-          initial={{ opacity: 0, y: 40 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="fixed bottom-24 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl text-sm font-semibold z-50"
-          style={{
-            background: toast.type === 'success' ? 'rgba(34,197,94,0.9)' : 'rgba(110,60,251,0.9)',
-            color: '#fff',
-            backdropFilter: 'blur(12px)',
-          }}
-          data-testid="checkin-toast"
-        >
-          {toast.message}
-        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 30 }} animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-24 left-1/2 -translate-x-1/2 px-5 py-3 text-xs font-bold z-50"
+          style={{ background: toast.ok ? '#22C55E' : '#6E3CFB', color: toast.ok ? '#000' : '#fff', border: `3px solid ${toast.ok ? '#16A34A' : '#4C1D95'}`, boxShadow: `3px 3px 0px ${toast.ok ? '#16A34A' : '#4C1D95'}` }}
+          data-testid="checkin-toast">{toast.msg}</motion.div>
       )}
     </motion.div>
   );
