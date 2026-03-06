@@ -1,0 +1,133 @@
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --gami-primary: #6E3CFB;
+  --gami-deep: #4C1D95;
+  --gami-accent: #A78BFA;
+  --gami-success: #22C55E;
+  --gami-bg: #030014;
+  --gami-paper: #0F0720;
+  --gami-surface: #1E1B2E;
+  --gami-border: #2D2B42;
+  --gami-text: #FFFFFF;
+  --gami-text-muted: #9CA3AF;
+}
+
+.light-mode {
+  --gami-bg: #F5F3FF;
+  --gami-paper: #FFFFFF;
+  --gami-surface: #EDE9FE;
+  --gami-border: #DDD6FE;
+  --gami-text: #1E1B2E;
+  --gami-text-muted: #6B7280;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Outfit', sans-serif;
+  background: var(--gami-bg);
+  color: var(--gami-text);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow-x: hidden;
+}
+
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 4px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: var(--gami-primary);
+  border-radius: 4px;
+}
+
+/* Glass morphism utility */
+.glass {
+  background: rgba(15, 7, 32, 0.7);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.light-mode .glass {
+  background: rgba(255, 255, 255, 0.8);
+  border: 1px solid rgba(110, 60, 251, 0.12);
+}
+
+.glass-card {
+  background: rgba(30, 27, 46, 0.6);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 20px;
+}
+
+.light-mode .glass-card {
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(110, 60, 251, 0.1);
+}
+
+/* Glow effects */
+.glow-purple {
+  box-shadow: 0 0 30px -5px rgba(110, 60, 251, 0.5);
+}
+
+.glow-success {
+  box-shadow: 0 0 20px -5px rgba(34, 197, 94, 0.4);
+}
+
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #6E3CFB, #A78BFA);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Noise overlay */
+.noise-bg::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Tab active indicator */
+.tab-active {
+  color: var(--gami-primary);
+}
+
+.tab-active::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 4px;
+  background: var(--gami-primary);
+  border-radius: 50%;
+}
+
+/* Custom selection */
+::selection {
+  background: rgba(110, 60, 251, 0.3);
+  color: #fff;
+}
