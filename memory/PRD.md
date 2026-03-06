@@ -1,60 +1,75 @@
 # Gami Wallet - PRD
 
 ## Original Problem Statement
-Design a modern mobile-first Gami Wallet UI inspired by the Rewards & Loyalty App UI Kit from UI8, adapting its clean reward dashboard structure into a Web3 gamified wallet experience. Purple gradient palette, dark/light mode, 4-tab bottom navigation.
+Design a mobile-first Gami Wallet UI with neobrutalism design pattern (inspired by gamiprotocol.io), combining Web3 wallet infrastructure, DeFi yield/staking, loyalty mechanics, and gamified engagement. Purple gradient palette (#6E3CFB, #4C1D95, #A78BFA). Dark/Light mode. 5-tab navigation.
 
 ## Architecture
 - **Frontend**: React 18 + Tailwind CSS + Framer Motion (mobile-first, max-width 430px)
 - **Backend**: FastAPI (Python) on port 8001
 - **Database**: MongoDB (gami_wallet)
-- **Design**: Glassmorphism dark theme, purple brand (#6E3CFB, #4C1D95, #A78BFA)
+- **Design**: Neobrutalism (thick 3px borders, hard 4px offset shadows, bold uppercase typography, Space Mono for numbers)
 
-## User Persona
-- Web3 crypto users, gamification enthusiasts, loyalty program users
-- Both crypto-native and non-crypto casual users
+## User Personas
+- Web3 crypto users managing multi-chain assets
+- Gamification enthusiasts earning XP/rewards
+- DeFi users staking and farming yield
+- Non-crypto casual users discovering crypto through gamification
 
 ## Core Requirements
-- Mobile-first wallet UI with gamified engagement
-- XP balance, streak tracking, missions, rewards marketplace, spin wheel
-- Dark mode (default) + Light mode toggle
-- Mock data in MongoDB with CRUD APIs
+- Neobrutalist mobile-first wallet UI
+- Multi-chain asset management (Gami, ETH, SOL, Polygon)
+- XP/loyalty system with missions and streaks
+- DeFi staking and yield farming
+- Rewards marketplace with brand vouchers/NFTs
+- Daily check-in and spin wheel gamification
+- Cross-chain identity and profile management
 
 ## What's Been Implemented (March 6, 2026)
-- **Home Screen**: XP card (2,321 pts), progress bar, quick actions (Check-in, Mission, Rewards, Referral), streak calendar, featured rewards
-- **Rewards Screen**: Search/filter, category pills (All/Voucher/Digital/NFT/Gadget), list/grid view toggle, Redeem Now buttons, 8 seeded rewards
-- **Points/Missions Screen**: Mission progress card (2/10), 10 missions with XP rewards, progress tracking, completion flow
-- **Daily Check-In Screen**: 199-day streak counter, monthly calendar with check-in history, milestone targets (125/150/175/200), Check In button
-- **Wheels/Spin Screen**: 8-segment spin wheel with physics animation, daily spin limit, result display
-- **Bottom Navigation**: 4 tabs (Home, Rewards, Points, Wheels) with animated active states
-- **Theme Toggle**: Dark/Light mode with CSS variables
-- **Backend APIs**: /api/user, /api/rewards, /api/missions, /api/checkins, /api/spin, /api/transactions, /api/user/checkin, /api/rewards/redeem, /api/missions/complete
-- **Testing**: 100% backend, 98% frontend pass rate
+
+### Iteration 1 - MVP (Glassmorphism, 4 tabs)
+- Home, Rewards, Points/Missions, Wheels screens
+- Basic MongoDB CRUD APIs
+
+### Iteration 2 - Major Redesign (Neobrutalism, 5 tabs) 
+- **Complete redesign** from glassmorphism to neobrutalism
+- **Home Screen**: Total balance ($12,847.32), XP/Staked/Rewards stats, 6 quick actions (Send, Receive, Swap, Stake, Claim, Check-in), top 3 assets with 24h change, streak calendar, featured rewards
+- **Wallet Screen**: Portfolio value, multi-chain network pills, 3-tab switcher (Tokens/NFTs/Activity), 5 token balances with USD values, 4 NFT cards with rarity badges, transaction history with status
+- **Rewards Screen**: Search/filter, 5 category pills, list/grid view toggle, 8 redeemable rewards with Redeem buttons
+- **Missions Screen**: Quest progress (3/10), Daily Check-in & Spin Wheel shortcuts, 10 missions with XP rewards & progress bars
+- **Earn Screen**: Total staked/earned/claimable overview, 2 active staking positions with APY, Claim All button, 5 staking pools with TVL/APY/lock period
+- **Profile Screen**: Avatar, wallet address, Level 12, 87 REP score, XP progress, stats grid, 3 connected wallets (Gami/ETH/SOL), referral code
+- **Check-In Screen**: 199-day streak, monthly calendar, 4 milestones (125/150/175/200)
+- **Spin Wheel Screen**: 8-segment wheel with physics animation, daily limit
+- **5-Tab Navigation**: Home, Wallet, Rewards, Missions, Earn
+- **Dark/Light Mode**: Full theme support with CSS variables
+- **Backend**: 13 API endpoints, 10 MongoDB collections, auto-seeded data
+- **Testing**: 100% backend, 100% frontend (37/37 tests passed)
 
 ## Prioritized Backlog
 ### P0 (Done)
-- All 5 screens implemented and functional
+- All 8 screens with neobrutalist design
 - Full CRUD APIs with MongoDB
-- Dark/Light mode support
-- Seed data
+- Multi-chain wallet display
+- DeFi staking dashboard
+- Dark/Light mode
 
 ### P1 (Next)
-- Privy.io authentication integration
-- Wallet connection (multi-chain)
-- Transaction history screen
-- Real token/NFT storage display
-- Gami chain integration hooks
+- Privy.io wallet authentication
+- Real wallet connection (MetaMask, Phantom)
+- Actual token send/receive/swap flows
+- Staking interaction (stake/unstake)
+- Gami chain integration
 
 ### P2 (Future)
-- Referral system with shareable codes
-- Push notifications for streaks
 - AI-driven reward recommendations
 - Partner brand campaign integration
-- Staking rewards display
-- Cross-chain identity
+- Push notifications
+- DAO governance integration
+- Cross-chain bridging UI
 
 ## Next Tasks
-1. Add privy.io wallet authentication
-2. Build transaction history view
-3. Add confetti animation on reward unlock/mission complete
-4. Implement referral flow with share functionality
-5. Add wallet balance display (multi-chain mock)
+1. Integrate privy.io for wallet auth
+2. Build Send/Receive token flow modals
+3. Add real staking interaction
+4. Implement swap flow UI
+5. Add confetti animation on reward unlock
