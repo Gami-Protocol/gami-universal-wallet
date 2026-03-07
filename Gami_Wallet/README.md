@@ -33,7 +33,25 @@ This project features a comprehensive Neo-UI design system with:
 npm install
 
 # Start development server
-npx expo start
+npm run start
+
+# Open native targets
+npm run ios
+npm run android
+```
+
+## 📦 App Store Builds (Expo/EAS)
+
+This app is configured for Expo managed builds with native package IDs:
+
+- iOS bundle identifier: `com.gamiprotocol.universalwallet`
+- Android application ID: `com.gamiprotocol.universalwallet`
+
+Use EAS to produce store binaries:
+
+```bash
+eas build --platform ios --profile production
+eas build --platform android --profile production
 ```
 
 ## 📱 Features
