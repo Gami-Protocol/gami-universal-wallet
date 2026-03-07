@@ -5,6 +5,12 @@ from datetime import datetime, timezone, timedelta
 import os
 import random
 from dotenv import load_dotenv
+from gamification import (
+    get_agent_tooling_profile,
+    enrich_rewards_with_agent_quality,
+    get_spin_segments,
+    resolve_spin_result,
+)
 
 load_dotenv()
 
@@ -240,7 +246,8 @@ def get_rewards(category: str = None, search: str = None):
         query["category"] = category
     if search:
         query["title"] = {"$regex": search, "$options": "i"}
-    return list(db.rewards.find(query, {"_id": 0}))
+    rewards = list(db.rewards.find(query, {"_id": 0}))
+    return enrich_rewards_with_agent_quality(rewards, get_agent_tooling_profile())
 
 
 @app.get("/api/missions")
@@ -282,8 +289,25 @@ def redeem_reward(data: dict):
         return {"success": False, "message": "Not enough XP"}
     db.users.update_one({"_id": user["_id"]}, {"$inc": {"xp": -reward["cost"]}})
     db.rewards.update_one({"_id": reward["_id"]}, {"$inc": {"stock": -1}})
-    db.transactions.insert_one({"user_id": str(user["_id"]), "type": "redeem", "amount": -reward["cost"], "token": "XP", "source": reward["title"], "date": datetime.now(timezone.utc).isoformat(), "status": "confirmed", "chain": "Gami Chain"})
-    return {"success": True, "message": f"Redeemed {title}!"}
+    profile = get_agent_tooling_profile()
+    db.transactions.insert_one(
+        {
+            "user_id": str(user["_id"]),
+            "type": "redeem",
+            "amount": -reward["cost"],
+            "token": "XP",
+            "source": reward["title"],
+            "date": datetime.now(timezone.utc).isoformat(),
+            "status": "confirmed",
+            "chain": "Gami Chain",
+            "agent_mode": profile["mode"],
+        }
+    )
+    return {
+        "success": True,
+        "message": f"Redeemed {title}!",
+        "agent_tooling": {"mode": profile["mode"], "chain_id": profile["gami_chain"]["chain_id"]},
+    }
 
 
 @app.put("/api/missions/complete")
@@ -308,18 +332,11 @@ def spin_wheel():
     existing = db.spins.find_one({"user_id": user_id, "date": today})
     if existing:
         return {"success": False, "message": "Already spun today", "result": existing.get("result")}
-    segments = [
-        {"label": "10 XP", "xp": 10, "weight": 25},
-        {"label": "25 XP", "xp": 25, "weight": 20},
-        {"label": "50 XP", "xp": 50, "weight": 15},
-        {"label": "100 XP", "xp": 100, "weight": 5},
-        {"label": "5 Tokens", "xp": 0, "tokens": 5, "weight": 10},
-        {"label": "NFT Badge", "xp": 0, "weight": 3},
-        {"label": "Try Again", "xp": 0, "weight": 15},
-        {"label": "2x Bonus", "xp": 0, "weight": 7},
-    ]
+    profile = get_agent_tooling_profile()
+    segments = get_spin_segments(profile)
     weights = [s["weight"] for s in segments]
-    result = random.choices(segments, weights=weights, k=1)[0]
+    selected = random.choices(segments, weights=weights, k=1)[0]
+    result = resolve_spin_result(selected, random.choice)
     db.spins.insert_one({"user_id": user_id, "result": result["label"], "date": today, "created_at": datetime.now(timezone.utc).isoformat()})
     updates = {"total_spins": 1}
     if result.get("xp", 0):
@@ -327,4 +344,26 @@ def spin_wheel():
     if result.get("tokens", 0):
         updates["tokens_balance"] = result["tokens"]
     db.users.update_one({"_id": user["_id"]}, {"$inc": updates})
-    return {"success": True, "result": result["label"], "xp_earned": result.get("xp", 0), "tokens_earned": result.get("tokens", 0)}
+    return {
+        "success": True,
+        "result": result["label"],
+        "xp_earned": result.get("xp", 0),
+        "tokens_earned": result.get("tokens", 0),
+        "gamification_quality": "agent_boosted" if result.get("agent_boost") or result.get("bonus_applied") else "standard",
+        "agent_tooling": {"mode": profile["mode"], "chain_id": profile["gami_chain"]["chain_id"]},
+    }
+
+
+@app.get("/api/agent/integration")
+def get_agent_integration():
+    profile = get_agent_tooling_profile()
+    return {
+        "enabled": profile["integration_enabled"],
+        "integration_mode": profile["mode"],
+        "chain": profile["gami_chain"],
+        "features": {
+            "agent_to_agent_wallet": True,
+            "enhanced_rewards": True,
+            "enhanced_spin_wheel": True,
+        },
+    }
