@@ -19,6 +19,7 @@ BONUS_BASE_SEGMENTS = [
     {"label": "5 Tokens", "xp": 0, "tokens": 5},
 ]
 MAX_REWARD_COST_FOR_QUALITY = 1000
+DEFAULT_WEBAPP_REPOSITORY = "https://github.com/Gami-Protocol/gami-webapp"
 
 
 def _read_float(env_key: str, default: float) -> float:
@@ -55,6 +56,37 @@ def get_agent_tooling_profile():
         "quality_multiplier": max(1.0, quality_multiplier),
         "reward_bonus_xp": max(0, reward_bonus),
         "spin_bonus_weight": max(0, spin_bonus_weight),
+    }
+
+
+def get_agent_integration_payload(profile):
+    """Builds the agent integration contract for web and agent-tooling clients.
+
+    The webapp repository can be overridden with `GAMI_WEBAPP_REPOSITORY`
+    (expected to be an absolute repository URL).
+    """
+    return {
+        "enabled": profile["integration_enabled"],
+        "integration_mode": profile["mode"],
+        "chain": profile["gami_chain"],
+        "webapp_repository": os.environ.get("GAMI_WEBAPP_REPOSITORY", DEFAULT_WEBAPP_REPOSITORY),
+        "features": {
+            "agent_to_agent_wallet": True,
+            "enhanced_rewards": True,
+            "enhanced_spin_wheel": True,
+        },
+        "endpoints": {
+            "health": {"method": "GET", "path": "/api/health"},
+            "user": {"method": "GET", "path": "/api/user"},
+            "rewards": {"method": "GET", "path": "/api/rewards"},
+            "rewards_redeem": {"method": "POST", "path": "/api/rewards/redeem"},
+            "spin": {"method": "POST", "path": "/api/spin"},
+            "missions": {"method": "GET", "path": "/api/missions"},
+            "missions_complete": {"method": "PUT", "path": "/api/missions/complete"},
+            "checkin": {"method": "PUT", "path": "/api/user/checkin"},
+            "agent_integration": {"method": "GET", "path": "/api/agent/integration"},
+            "agent_tooling": {"method": "GET", "path": "/api/agent/tooling"},
+        },
     }
 
 
