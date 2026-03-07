@@ -58,6 +58,32 @@ def get_agent_tooling_profile():
     }
 
 
+def get_agent_integration_payload(profile):
+    return {
+        "enabled": profile["integration_enabled"],
+        "integration_mode": profile["mode"],
+        "chain": profile["gami_chain"],
+        "webapp_repository": os.environ.get("GAMI_WEBAPP_REPOSITORY", "https://github.com/Gami-Protocol/gami-webapp"),
+        "features": {
+            "agent_to_agent_wallet": True,
+            "enhanced_rewards": True,
+            "enhanced_spin_wheel": True,
+        },
+        "endpoints": {
+            "health": {"method": "GET", "path": "/api/health"},
+            "user": {"method": "GET", "path": "/api/user"},
+            "rewards": {"method": "GET", "path": "/api/rewards"},
+            "rewards_redeem": {"method": "POST", "path": "/api/rewards/redeem"},
+            "spin": {"method": "POST", "path": "/api/spin"},
+            "missions": {"method": "GET", "path": "/api/missions"},
+            "missions_complete": {"method": "PUT", "path": "/api/missions/complete"},
+            "checkin": {"method": "PUT", "path": "/api/user/checkin"},
+            "agent_integration": {"method": "GET", "path": "/api/agent/integration"},
+            "agent_tooling": {"method": "GET", "path": "/api/agent/tooling"},
+        },
+    }
+
+
 def enrich_rewards_with_agent_quality(rewards, profile):
     quality_multiplier = profile.get("quality_multiplier", 1.0)
     bonus_xp = profile.get("reward_bonus_xp", 0)

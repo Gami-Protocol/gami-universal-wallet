@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 try:
     from backend.gamification import (
         get_agent_tooling_profile,
+        get_agent_integration_payload,
         enrich_rewards_with_agent_quality,
         get_spin_segments,
         resolve_spin_result,
@@ -15,6 +16,7 @@ try:
 except ImportError:
     from gamification import (
         get_agent_tooling_profile,
+        get_agent_integration_payload,
         enrich_rewards_with_agent_quality,
         get_spin_segments,
         resolve_spin_result,
@@ -365,13 +367,10 @@ def spin_wheel():
 @app.get("/api/agent/integration")
 def get_agent_integration():
     profile = get_agent_tooling_profile()
-    return {
-        "enabled": profile["integration_enabled"],
-        "integration_mode": profile["mode"],
-        "chain": profile["gami_chain"],
-        "features": {
-            "agent_to_agent_wallet": True,
-            "enhanced_rewards": True,
-            "enhanced_spin_wheel": True,
-        },
-    }
+    return get_agent_integration_payload(profile)
+
+
+@app.get("/api/agent/tooling")
+def get_agent_tooling():
+    profile = get_agent_tooling_profile()
+    return get_agent_integration_payload(profile)

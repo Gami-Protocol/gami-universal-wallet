@@ -1,6 +1,7 @@
 import unittest
 
 from backend.gamification import (
+    get_agent_integration_payload,
     enrich_rewards_with_agent_quality,
     get_agent_tooling_profile,
     get_spin_segments,
@@ -35,6 +36,15 @@ class GamificationHelpersTests(unittest.TestCase):
         self.assertTrue(result["bonus_applied"])
         self.assertEqual(result["xp"], 50)
         self.assertEqual(result["label"], "2x Bonus (25 XP)")
+
+    def test_agent_integration_payload_includes_webapp_and_rewards_endpoints(self):
+        profile = get_agent_tooling_profile()
+        payload = get_agent_integration_payload(profile)
+
+        self.assertEqual(payload["webapp_repository"], "https://github.com/Gami-Protocol/gami-webapp")
+        self.assertEqual(payload["endpoints"]["rewards"]["path"], "/api/rewards")
+        self.assertEqual(payload["endpoints"]["rewards_redeem"]["path"], "/api/rewards/redeem")
+        self.assertEqual(payload["endpoints"]["agent_tooling"]["path"], "/api/agent/tooling")
 
 
 if __name__ == "__main__":
