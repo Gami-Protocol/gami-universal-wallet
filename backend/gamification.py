@@ -19,6 +19,7 @@ BONUS_BASE_SEGMENTS = [
     {"label": "5 Tokens", "xp": 0, "tokens": 5},
 ]
 MAX_REWARD_COST_FOR_QUALITY = 1000
+DEFAULT_WEBAPP_REPOSITORY = "https://github.com/Gami-Protocol/gami-webapp"
 
 
 def _read_float(env_key: str, default: float) -> float:
@@ -59,11 +60,16 @@ def get_agent_tooling_profile():
 
 
 def get_agent_integration_payload(profile):
+    """Builds the agent integration contract for web and agent-tooling clients.
+
+    The webapp repository can be overridden with `GAMI_WEBAPP_REPOSITORY`
+    (expected to be an absolute repository URL).
+    """
     return {
         "enabled": profile["integration_enabled"],
         "integration_mode": profile["mode"],
         "chain": profile["gami_chain"],
-        "webapp_repository": os.environ.get("GAMI_WEBAPP_REPOSITORY", "https://github.com/Gami-Protocol/gami-webapp"),
+        "webapp_repository": os.environ.get("GAMI_WEBAPP_REPOSITORY", DEFAULT_WEBAPP_REPOSITORY),
         "features": {
             "agent_to_agent_wallet": True,
             "enhanced_rewards": True,
