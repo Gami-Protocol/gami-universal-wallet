@@ -5,12 +5,20 @@ from datetime import datetime, timezone, timedelta
 import os
 import random
 from dotenv import load_dotenv
-from gamification import (
-    get_agent_tooling_profile,
-    enrich_rewards_with_agent_quality,
-    get_spin_segments,
-    resolve_spin_result,
-)
+try:
+    from backend.gamification import (
+        get_agent_tooling_profile,
+        enrich_rewards_with_agent_quality,
+        get_spin_segments,
+        resolve_spin_result,
+    )
+except ImportError:
+    from gamification import (
+        get_agent_tooling_profile,
+        enrich_rewards_with_agent_quality,
+        get_spin_segments,
+        resolve_spin_result,
+    )
 
 load_dotenv()
 

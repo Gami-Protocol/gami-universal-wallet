@@ -29,7 +29,8 @@ class GamificationHelpersTests(unittest.TestCase):
 
     def test_two_x_bonus_segment_applies_multiplier(self):
         segment = {"label": "2x Bonus", "xp": 0}
-        result = resolve_spin_result(segment, lambda values: values[0])
+        deterministic_choice = lambda values: {"label": "25 XP", "xp": 25, "tokens": 0}
+        result = resolve_spin_result(segment, deterministic_choice)
 
         self.assertTrue(result["bonus_applied"])
         self.assertEqual(result["xp"], 50)

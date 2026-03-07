@@ -18,6 +18,7 @@ BONUS_BASE_SEGMENTS = [
     {"label": "50 XP", "xp": 50, "tokens": 0},
     {"label": "5 Tokens", "xp": 0, "tokens": 5},
 ]
+MAX_REWARD_COST_FOR_QUALITY = 1000
 
 
 def _read_float(env_key: str, default: float) -> float:
@@ -64,7 +65,7 @@ def enrich_rewards_with_agent_quality(rewards, profile):
     for reward in rewards:
         item = deepcopy(reward)
         base_cost = item.get("cost", 0)
-        quality_score = int(max(0, (1000 - base_cost) * quality_multiplier))
+        quality_score = int(max(0, (MAX_REWARD_COST_FOR_QUALITY - base_cost) * quality_multiplier))
         item["agent_quality_score"] = quality_score
         item["agent_bonus_xp"] = bonus_xp
         item["gamification_tier"] = "elite" if quality_score >= 950 else "boosted"
@@ -93,8 +94,16 @@ def resolve_spin_result(selected_segment, random_choice):
     result = deepcopy(selected_segment)
     if result.get("label") == "2x Bonus":
         base = random_choice(BONUS_BASE_SEGMENTS)
-        result["label"] = f"2x Bonus ({base['label']})"
-        result["xp"] = base.get("xp", 0) * 2
-        result["tokens"] = base.get("tokens", 0) * 2
+        base_xp = base.get("xp", 0)
+        base_tokens = base.get("tokens", 0)
+        if base_xp > 0:
+            reward_label = f"{base_xp} XP"
+        elif base_tokens > 0:
+            reward_label = f"{base_tokens} Tokens"
+        else:
+            reward_label = base.get("label", "Reward")
+        result["label"] = f"2x Bonus ({reward_label})"
+        result["xp"] = base_xp * 2
+        result["tokens"] = base_tokens * 2
         result["bonus_applied"] = True
     return result
