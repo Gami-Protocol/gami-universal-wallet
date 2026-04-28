@@ -10,6 +10,8 @@
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
+    "@walletconnect/ethereum-provider": "^2.21.4",
+    "ethers": "^6.15.0",
     "vite": "latest",
     "typescript": "latest",
     "react": "latest",
