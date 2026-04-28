@@ -16,11 +16,28 @@
         "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc-dev.gamiprotocol.xyz"
       }
     },
+    "testflight": {
+      "distribution": "store",
+      "channel": "testflight",
+      "autoIncrement": true,
+      "ios": {
+        "resourceClass": "m-medium",
+        "enterpriseProvisioning": "universal"
+      },
+      "env": {
+        "APP_ENV": "testflight",
+        "EXPO_PUBLIC_APP_ENV": "testflight",
+        "EXPO_PUBLIC_API_URL": "https://api-staging.gamiprotocol.xyz",
+        "EXPO_PUBLIC_GAMI_CHAIN_ID": "7777777",
+        "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc-staging.gamiprotocol.xyz"
+      }
+    },
     "preview": {
       "distribution": "internal",
       "channel": "preview",
       "ios": {
-        "simulator": false
+        "simulator": false,
+        "resourceClass": "m-medium"
       },
       "android": {
         "buildType": "apk"
@@ -52,6 +69,13 @@
     }
   },
   "submit": {
+    "testflight": {
+      "ios": {
+        "appleId": "admin@gamiprotocol.io",
+        "ascAppId": "REPLACE_WITH_APP_STORE_CONNECT_APP_ID",
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      }
+    },
     "production": {
       "ios": {},
       "android": {}
