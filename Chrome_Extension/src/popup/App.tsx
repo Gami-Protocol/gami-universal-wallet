@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { GAMI_API_URL } from '../config';
 import { connectWallet } from '../wallet/walletConnect';
+import { signInWithEthereum } from '../auth/siwe';
 
 export default function App() {
   const [enabled, setEnabled] = useState(false);
@@ -24,9 +25,20 @@ export default function App() {
     try {
       const addr = await connectWallet();
       setAddress(addr);
-      setStatus('Connected');
+      setStatus('Wallet Connected');
     } catch {
       setStatus('Error');
+    }
+  }
+
+  async function handleSIWE() {
+    if (!address) return;
+    setStatus('Signing...');
+    try {
+      await signInWithEthereum(address);
+      setStatus('Authenticated');
+    } catch {
+      setStatus('Auth Failed');
     }
   }
 
@@ -42,7 +54,12 @@ export default function App() {
 
       <button onClick={handleConnect}>Connect Wallet</button>
       <p>Status: {status}</p>
-      {address && <p>{address}</p>}
+      {address && (
+        <>
+          <p>{address}</p>
+          <button onClick={handleSIWE}>Sign In</button>
+        </>
+      )}
 
       <hr />
 
