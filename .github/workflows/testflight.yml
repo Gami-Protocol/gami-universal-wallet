@@ -14,18 +14,12 @@ on:
   push:
     branches:
       - main
-    paths:
+    paths-ignore:
       - "app.json"
       - "app.config.*"
-      - "eas.json"
-      - "package.json"
-      - "package-lock.json"
-      - "yarn.lock"
-      - "pnpm-lock.yaml"
-      - "src/**"
-      - "app/**"
-      - "ios/**"
-      - ".github/workflows/testflight.yml"
+
+permissions:
+  contents: write
 
 concurrency:
   group: testflight-ios-${{ github.ref }}
@@ -53,6 +47,8 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -68,6 +64,44 @@ jobs:
             npm install
           fi
 
+      - name: Auto increment iOS build number
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'app.json';
+
+          if (!fs.existsSync(path)) {
+            console.error('app.json not found. Add app.json or implement app.config.js version bump logic.');
+            process.exit(1);
+          }
+
+          const raw = fs.readFileSync(path, 'utf8');
+          const appJson = JSON.parse(raw);
+          appJson.expo = appJson.expo || {};
+          appJson.expo.ios = appJson.expo.ios || {};
+
+          const currentBuildNumber = Number(appJson.expo.ios.buildNumber || 0);
+          const nextBuildNumber = currentBuildNumber + 1;
+
+          appJson.expo.ios.buildNumber = String(nextBuildNumber);
+
+          fs.writeFileSync(path, JSON.stringify(appJson, null, 2) + '\n');
+          console.log(`iOS buildNumber bumped from ${currentBuildNumber} to ${nextBuildNumber}`);
+          NODE
+
+      - name: Commit build number bump
+        run: |
+          if git diff --quiet app.json; then
+            echo "No build number change to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app.json
+          git commit -m "ci: bump iOS build number [skip ci]"
+          git push
+
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
         with:
@@ -78,7 +112,7 @@ jobs:
         run: npx expo doctor
 
       - name: Build iOS app with EAS
-        run: eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive --no-wait
+        run: eas build --platform ios --profile ${{ github.event.inputs.profile || 'production' }} --non-interactive
 
       - name: Submit latest iOS build to TestFlight
         run: eas submit --platform ios --latest --non-interactive
