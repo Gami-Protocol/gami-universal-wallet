@@ -88,7 +88,7 @@ config.resolver.resolveRequest = (context, moduleName, platform) => {
 
 const cacheDir = path.join(__dirname, 'caches');
 
-config.cacheStores = () => [
+config.cacheStores = [
   new FileStore({
     root: path.join(cacheDir, '.metro-cache'),
   }),

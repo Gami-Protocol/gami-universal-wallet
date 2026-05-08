@@ -1,0 +1,40 @@
+{
+  "name": "@gami/universal-wallet",
+  "version": "1.0.0",
+  "description": "Gami Protocol Universal Wallet with blockchain connection and airdrop validation",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "dev": "tsc --watch",
+    "test": "jest",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "gami",
+    "wallet",
+    "blockchain",
+    "web3",
+    "airdrop",
+    "xp",
+    "cosmos",
+    "evm"
+  ],
+  "author": "Gami Protocol",
+  "license": "MIT",
+  "dependencies": {
+    "viem": "^2.0.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^29.0.0",
+    "@types/node": "^20.0.0",
+    "@types/react": "~19.1.10",
+    "@typescript-eslint/eslint-plugin": "^6.0.0",
+    "@typescript-eslint/parser": "^6.0.0",
+    "eslint": "^8.0.0",
+    "jest": "^29.0.0",
+    "ts-jest": "^29.0.0",
+    "typescript": "^5.3.0"
+  }
+}
