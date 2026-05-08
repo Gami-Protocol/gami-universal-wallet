@@ -49,7 +49,11 @@ describe("GamiToken", () => {
     const { token, treasury, alice, bob } = await deploy();
     // Treasury owns the supply, so it signs the permit
     const value = ethers.parseEther("10");
-    const deadline = Math.floor(Date.now() / 1000) + 3600;
+    // Earlier tests in the suite advance hardhat's block time, so wall-clock
+    // Date.now() can be in the past relative to the chain. Use the latest
+    // block's timestamp + 1h as the deadline.
+    const latest = (await ethers.provider.getBlock("latest"))!;
+    const deadline = latest.timestamp + 3600;
     const nonce = await token.nonces(treasury.address);
     const network = await ethers.provider.getNetwork();
     const domain = {
