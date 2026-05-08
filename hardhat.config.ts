@@ -12,6 +12,12 @@ const config: HardhatUserConfig = {
       optimizer: { enabled: true, runs: 200 },
     },
   },
+  paths: {
+    // Tests live next to the contracts they exercise. Without this,
+    // hardhat test would glob the default ./test directory (which does
+    // not exist) and silently run zero tests.
+    tests: "contracts/test",
+  },
   networks: {
     base: {
       url: process.env.BASE_RPC || "",

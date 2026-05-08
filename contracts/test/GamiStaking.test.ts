@@ -46,16 +46,23 @@ describe("GamiStaking", () => {
     const { token, staking, alice } = await deploy();
     const amount = ethers.parseEther("100");
     await token.connect(alice).approve(await staking.getAddress(), amount);
-    await staking.connect(alice).stake(amount);
 
+    // Pin the stake timestamp so duration is exactly 10 days at unstake.
+    const stakeTx = await staking.connect(alice).stake(amount);
+    const stakeBlock = (await ethers.provider.getBlock(
+      (await stakeTx.wait())!.blockNumber
+    ))!;
     const startBalance = await token.balanceOf(alice.address);
 
-    // Advance exactly 10 days. Reward formula: amount * duration / 1 days / 10
-    // => 100 * 10 / 10 = 10 GAMI reward
-    await time.increase(10 * 24 * 60 * 60);
+    // Reward formula in the contract: amount * duration / 1 days / 10
+    // With duration = 10 days: 100 GAMI * 10 days / 1 day / 10 = 100 GAMI.
+    // i.e. the contract pays a 10%/day linear reward, so after 10 days the
+    // reward equals the principal.
+    const TEN_DAYS = 10 * 24 * 60 * 60;
+    await time.setNextBlockTimestamp(stakeBlock.timestamp + TEN_DAYS);
     await staking.connect(alice).unstake();
 
-    const expectedReward = ethers.parseEther("10");
+    const expectedReward = ethers.parseEther("100");
     const endBalance = await token.balanceOf(alice.address);
     expect(endBalance - startBalance).to.equal(amount + expectedReward);
 
