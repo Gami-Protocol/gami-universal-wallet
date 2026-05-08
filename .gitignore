@@ -11,6 +11,13 @@ build/
 .next/
 .vercel/
 
+# Hardhat
+artifacts/
+cache/
+typechain-types/
+coverage/
+coverage.json
+
 # Env/IDE/OS
 .env*
 .DS_Store
