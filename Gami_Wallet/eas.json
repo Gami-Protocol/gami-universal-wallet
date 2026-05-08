@@ -6,16 +6,60 @@
 	"build": {
 		"development": {
 			"developmentClient": true,
-			"distribution": "internal"
+			"distribution": "internal",
+			"env": {
+				"EXPO_PUBLIC_ENV": "development",
+				"EXPO_PUBLIC_API_URL": "http://localhost:4000",
+				"EXPO_PUBLIC_WS_URL": "ws://localhost:4000/ws",
+				"EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyB1Q-rZwABjnaH-3IgY5OUudR0wtvlQqv0",
+				"EXPO_PUBLIC_FIREBASE_PROJECT_ID": "gami-wallet",
+				"EXPO_PUBLIC_ENABLE_BRIDGE": "true",
+				"EXPO_PUBLIC_ENABLE_STAKING": "true",
+				"EXPO_PUBLIC_ENABLE_AGENTS": "true",
+				"EXPO_PUBLIC_ENABLE_MULTI_CHAIN": "true"
+			}
 		},
 		"preview": {
-			"distribution": "internal"
+			"distribution": "internal",
+			"channel": "preview",
+			"env": {
+				"EXPO_PUBLIC_ENV": "testnet",
+				"EXPO_PUBLIC_API_URL": "https://testnet-api.gamiprotocol.io",
+				"EXPO_PUBLIC_WS_URL": "wss://testnet-api.gamiprotocol.io/ws",
+				"EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyB1Q-rZwABjnaH-3IgY5OUudR0wtvlQqv0",
+				"EXPO_PUBLIC_FIREBASE_PROJECT_ID": "gami-wallet",
+				"EXPO_PUBLIC_ENABLE_BRIDGE": "true",
+				"EXPO_PUBLIC_ENABLE_STAKING": "true",
+				"EXPO_PUBLIC_ENABLE_AGENTS": "true",
+				"EXPO_PUBLIC_ENABLE_MULTI_CHAIN": "true"
+			}
 		},
 		"production": {
-			"autoIncrement": true
+			"autoIncrement": true,
+			"channel": "production",
+			"env": {
+				"EXPO_PUBLIC_ENV": "production",
+				"EXPO_PUBLIC_API_URL": "https://api.gamiprotocol.io",
+				"EXPO_PUBLIC_WS_URL": "wss://api.gamiprotocol.io/ws",
+				"EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyB1Q-rZwABjnaH-3IgY5OUudR0wtvlQqv0",
+				"EXPO_PUBLIC_FIREBASE_PROJECT_ID": "gami-wallet",
+				"EXPO_PUBLIC_ENABLE_BRIDGE": "true",
+				"EXPO_PUBLIC_ENABLE_STAKING": "true",
+				"EXPO_PUBLIC_ENABLE_AGENTS": "true",
+				"EXPO_PUBLIC_ENABLE_MULTI_CHAIN": "true"
+			}
 		}
 	},
 	"submit": {
-		"production": {}
+		"production": {
+			"ios": {
+				"appleId": "billionairemarcus@icloud.com",
+				"ascAppId": "6443804418"
+			},
+			"android": {
+				"serviceAccountKeyPath": "./google-service-account.json",
+				"track": "internal"
+			}
+		}
 	}
 }

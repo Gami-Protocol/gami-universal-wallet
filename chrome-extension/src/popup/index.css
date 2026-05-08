@@ -1,0 +1,147 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --gami-bg: #0E0E12;
+  --gami-bg-elev: #16161D;
+  --gami-bg-card: #1C1C26;
+  --gami-purple: #6E3CFB;
+  --gami-purple-deep: #4B24B8;
+  --gami-purple-light: #9C6CFF;
+  --gami-purple-soft: rgba(110, 60, 251, 0.16);
+  --gami-text: #FFFFFF;
+  --gami-text-dim: rgba(255, 255, 255, 0.62);
+  --gami-text-muted: rgba(255, 255, 255, 0.38);
+  --gami-success: #3FE0A0;
+  --gami-warn: #FFB23F;
+  --gami-pink: #FF4FA8;
+  --gami-cyan: #4FE3FF;
+  --brutal: 6px 6px 0 0 #000;
+  --brutal-purple: 6px 6px 0 0 #6E3CFB;
+  --brutal-pink: 6px 6px 0 0 #FF4FA8;
+}
+
+html, body {
+  width: 380px;
+  height: 600px;
+  background-color: var(--gami-bg);
+  color: var(--gami-text);
+  font-family: 'Inter', system-ui, sans-serif;
+  overflow-x: hidden;
+}
+
+#root { width: 100%; height: 100%; }
+
+/* Scanlines */
+.scanlines {
+  position: fixed; inset: 0; pointer-events: none; z-index: 200; opacity: 0.04;
+  background-image: repeating-linear-gradient(0deg, #fff 0, #fff 1px, transparent 1px, transparent 3px);
+}
+
+/* Brutal card */
+.brutal-card {
+  background: var(--gami-bg-card);
+  border: 2px solid #000;
+  box-shadow: var(--brutal);
+}
+.brutal-card-purple {
+  background: var(--gami-bg-card);
+  border: 1.5px solid var(--gami-purple);
+  position: relative;
+}
+
+/* Brutal button */
+.brutal-btn {
+  display: flex; align-items: center; justify-content: center; gap: 8px;
+  width: 100%; padding: 13px 18px;
+  font-family: 'Space Grotesk', sans-serif; font-weight: 700;
+  font-size: 13px; letter-spacing: 0.06em; text-transform: uppercase;
+  border-radius: 0; cursor: pointer;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.brutal-btn:active { transform: translate(4px, 4px); box-shadow: none !important; }
+.brutal-btn-primary  { background: var(--gami-purple); color: #fff;  border: 2.5px solid #000; box-shadow: var(--brutal); }
+.brutal-btn-pink     { background: var(--gami-pink);   color: #fff;  border: 2.5px solid #000; box-shadow: var(--brutal); }
+.brutal-btn-success  { background: var(--gami-success); color: #000; border: 2.5px solid #000; box-shadow: var(--brutal); }
+.brutal-btn-ghost    { background: transparent; color: var(--gami-purple-light); border: 2px solid var(--gami-purple); box-shadow: var(--brutal-purple); }
+.brutal-btn-sm { padding: 8px 14px; font-size: 11px; }
+
+/* Term box */
+.term-box { border: 1.5px solid var(--gami-purple); position: relative; padding: 12px 14px; }
+.term-box-success { border-color: var(--gami-success); }
+.term-box-pink    { border-color: var(--gami-pink); }
+.term-box-label {
+  position: absolute; top: -8px; left: 12px; padding: 0 6px;
+  background: var(--gami-bg); color: var(--gami-purple-light);
+  font-family: 'JetBrains Mono', monospace; font-size: 9px; letter-spacing: 0.15em; text-transform: uppercase;
+}
+
+/* Glows */
+.glow-blob {
+  position: absolute; border-radius: 50%; filter: blur(60px);
+  pointer-events: none; animation: gami-pulse-glow 4s ease-in-out infinite;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 2px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(110,60,251,0.35); }
+
+/* Typography helpers */
+.font-display { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+.font-mono    { font-family: 'JetBrains Mono', monospace; }
+
+/* Animations */
+@keyframes gami-pulse-glow {
+  0%, 100% { opacity: 0.45; filter: blur(55px); }
+  50%       { opacity: 0.8;  filter: blur(75px); }
+}
+@keyframes gami-bob {
+  0%, 100% { transform: translateY(0); }
+  50%       { transform: translateY(-5px); }
+}
+@keyframes cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+@keyframes gami-fade-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes xp-fill {
+  from { stroke-dashoffset: var(--dash-max); }
+  to   { stroke-dashoffset: var(--dash-offset); }
+}
+
+.cursor-blink { animation: cursor-blink 1s step-end infinite; }
+.fade-in      { animation: gami-fade-in 0.22s ease-out forwards; }
+.bob          { animation: gami-bob 3s ease-in-out infinite; }
+
+/* Pill tag */
+.gami-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  font-family: 'JetBrains Mono', monospace; font-size: 10px;
+  letter-spacing: 0.08em; text-transform: uppercase;
+  padding: 4px 9px; border: 1.5px solid rgba(255,255,255,0.18);
+  background: rgba(255,255,255,0.04);
+}
+.gami-pill-purple {
+  background: var(--gami-purple-soft);
+  border-color: var(--gami-purple);
+  color: var(--gami-purple-light);
+}
+.gami-pill-green {
+  background: rgba(63,224,160,0.12);
+  border-color: var(--gami-success);
+  color: var(--gami-success);
+}
+.gami-pill-pink {
+  background: rgba(255,79,168,0.12);
+  border-color: var(--gami-pink);
+  color: var(--gami-pink);
+}

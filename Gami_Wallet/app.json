@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Create mobile app",
+    "name": "Gami Universal Wallet",
     "slug": "gami-wallet",
     "scheme": "gamiwallet",
     "version": "1.0.0",
@@ -8,22 +8,53 @@
     "icon": "./assets/images/icon.png",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/images/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#0E0E12"
+    },
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      }
+      },
+      "bundleIdentifier": "com.gamiprotocol.wallet",
+      "associatedDomains": [
+        "applinks:app.gamiprotocol.com"
+      ]
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#ffffff"
+        "backgroundColor": "#0E0E12"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "package": "xyz.create.CreateExpoEnvironment"
+      "package": "com.gamiprotocol.wallet",
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "autoVerify": true,
+          "data": [
+            {
+              "scheme": "gamiwallet",
+              "host": "oauth",
+              "pathPrefix": "/discord"
+            },
+            {
+              "scheme": "gamiwallet",
+              "host": "oauth",
+              "pathPrefix": "/twitter"
+            }
+          ],
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ]
+        }
+      ]
     },
     "plugins": [
       [
@@ -37,14 +68,16 @@
         {
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
-          "resizeMode": "contain"
+          "resizeMode": "contain",
+          "backgroundColor": "#0E0E12"
         }
       ],
       "expo-audio",
       "expo-video",
       "expo-secure-store",
       "expo-web-browser",
-      "expo-font"
+      "expo-font",
+      "expo-asset"
     ],
     "web": {
       "bundler": "metro",
@@ -55,11 +88,16 @@
     },
     "extra": {
       "router": {
-        "origin": false
+        "origin": false,
+        "sitemap": false
+      },
+      "eas": {
+        "projectId": "a34177f8-42ca-48d4-8c87-39f82476418e"
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    }
+    },
+    "owner": "gami-protocols-organization"
   }
 }
