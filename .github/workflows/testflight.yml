@@ -1,0 +1,127 @@
+name: Deploy iOS build to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Target environment"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - staging
+          - production
+  push:
+    branches:
+      - main
+      - develop
+    paths-ignore:
+      - "app.json"
+      - "app.config.*"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: testflight-ios-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-and-submit-ios:
+    name: Build and submit iOS to TestFlight
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      DEPLOY_ENV: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
+      EAS_PROFILE: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && 'preview' || 'production' }}
+      EXPO_PUBLIC_API_BASE_URL: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_API_BASE_URL || secrets.PRODUCTION_EXPO_PUBLIC_API_BASE_URL }}
+      EXPO_PUBLIC_FIREBASE_API_KEY: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_API_KEY || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_API_KEY }}
+      EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
+      EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_PROJECT_ID || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
+      EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET }}
+      EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID }}
+      EXPO_PUBLIC_FIREBASE_APP_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_APP_ID || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_APP_ID }}
+      EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID || secrets.PRODUCTION_EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID }}
+      EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID || secrets.PRODUCTION_EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID }}
+      EXPO_PUBLIC_PRIVY_APP_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_PRIVY_APP_ID || secrets.PRODUCTION_EXPO_PUBLIC_PRIVY_APP_ID }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show selected deployment target
+        run: |
+          echo "Deploy environment: $DEPLOY_ENV"
+          echo "EAS profile: $EAS_PROFILE"
+          echo "Branch: ${{ github.ref_name }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Auto increment iOS build number
+        run: |
+          node <<'NODE'
+          const fs = require('fs');
+          const path = 'app.json';
+
+          if (!fs.existsSync(path)) {
+            console.error('app.json not found. Add app.json or implement app.config.js version bump logic.');
+            process.exit(1);
+          }
+
+          const raw = fs.readFileSync(path, 'utf8');
+          const appJson = JSON.parse(raw);
+          appJson.expo = appJson.expo || {};
+          appJson.expo.ios = appJson.expo.ios || {};
+
+          const currentBuildNumber = Number(appJson.expo.ios.buildNumber || 0);
+          const nextBuildNumber = currentBuildNumber + 1;
+
+          appJson.expo.ios.buildNumber = String(nextBuildNumber);
+
+          fs.writeFileSync(path, JSON.stringify(appJson, null, 2) + '\n');
+          console.log(`iOS buildNumber bumped from ${currentBuildNumber} to ${nextBuildNumber}`);
+          NODE
+
+      - name: Commit build number bump
+        run: |
+          if git diff --quiet app.json; then
+            echo "No build number change to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add app.json
+          git commit -m "ci: bump iOS build number [skip ci]"
+          git push
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Validate Expo project
+        run: npx expo doctor
+
+      - name: Build iOS app with EAS
+        run: eas build --platform ios --profile "$EAS_PROFILE" --non-interactive
+
+      - name: Submit latest iOS build to TestFlight
+        run: eas submit --platform ios --latest --profile "$EAS_PROFILE" --non-interactive

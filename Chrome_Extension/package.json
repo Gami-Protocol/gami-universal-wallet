@@ -1,0 +1,26 @@
+{
+  "name": "gami-chrome-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "vite build --watch",
+    "build": "vite build",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@vitejs/plugin-react": "latest",
+    "@walletconnect/ethereum-provider": "^2.21.4",
+    "ethers": "^6.15.0",
+    "vite": "latest",
+    "typescript": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "lucide-react": "latest"
+  },
+  "devDependencies": {
+    "@types/chrome": "latest",
+    "@types/react": "latest",
+    "@types/react-dom": "latest"
+  }
+}

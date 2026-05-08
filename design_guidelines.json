@@ -1,0 +1,176 @@
+{
+  "project_name": "Gami Wallet",
+  "design_philosophy": {
+    "identity": "The Neon Noir Loyalty Hub",
+    "core_principles": [
+      "Gamification First: Every interaction provides feedback (haptic, visual, auditory).",
+      "Crypto Native, Human Friendly: Use crypto aesthetics (glass, neon) but hide complexity.",
+      "Depth over Flatness: Use layers, z-index, and backdrop-blur to create a tactile 3D space.",
+      "Mobile Obsession: Thumb-zone navigation is law. No essential buttons in the top corners."
+    ],
+    "mood_board": {
+      "emotional_tone": "Exciting, Exclusive, Progressive, High-Tech",
+      "visual_style": "Dark Glassmorphism, Cyberpunk Accents, Liquid Gradients"
+    }
+  },
+  "typography": {
+    "font_family": {
+      "heading": "Outfit, sans-serif",
+      "body": "Inter, sans-serif",
+      "mono": "JetBrains Mono, monospace"
+    },
+    "scale": {
+      "h1": "text-4xl font-bold tracking-tight",
+      "h2": "text-3xl font-bold tracking-tight",
+      "h3": "text-2xl font-semibold",
+      "h4": "text-xl font-semibold",
+      "body": "text-base leading-relaxed text-muted-foreground",
+      "small": "text-sm font-medium text-muted-foreground/80",
+      "label": "text-xs font-bold uppercase tracking-widest text-muted-foreground/60"
+    }
+  },
+  "colors": {
+    "palette": {
+      "primary": {
+        "DEFAULT": "#6E3CFB",
+        "foreground": "#FFFFFF",
+        "hover": "#5B2AD8",
+        "active": "#4C1D95"
+      },
+      "secondary": {
+        "DEFAULT": "#A78BFA",
+        "foreground": "#0F0720",
+        "hover": "#8B5CF6"
+      },
+      "accent": {
+        "DEFAULT": "#22C55E",
+        "foreground": "#FFFFFF",
+        "description": "Used for success states and XP gains"
+      },
+      "background": {
+        "DEFAULT": "#030014",
+        "paper": "#0F0720",
+        "glass": "rgba(15, 7, 32, 0.7)"
+      },
+      "surface": {
+        "DEFAULT": "#1E1B2E",
+        "border": "#2D2B42"
+      }
+    },
+    "gradients": {
+      "primary": "bg-gradient-to-br from-[#6E3CFB] to-[#4C1D95]",
+      "glass": "bg-white/5 backdrop-blur-xl border border-white/10",
+      "glass_hover": "hover:bg-white/10 transition-colors duration-300",
+      "glow": "shadow-[0_0_30px_-5px_rgba(110,60,251,0.5)]"
+    }
+  },
+  "layout_system": {
+    "grid_strategy": "Bento Grid (Mobile-First)",
+    "spacing": {
+      "page_padding": "p-4 md:p-6",
+      "section_gap": "gap-6",
+      "card_padding": "p-5"
+    },
+    "container": {
+      "max_width": "max-w-md mx-auto",
+      "description": "Constrain the app to a mobile-width on desktop to maintain the app-feel."
+    }
+  },
+  "components": {
+    "buttons": {
+      "primary": "bg-primary text-primary-foreground h-12 rounded-2xl font-bold shadow-lg shadow-primary/25 hover:shadow-primary/40 transition-all hover:-translate-y-0.5 active:translate-y-0",
+      "secondary": "bg-secondary/10 text-secondary border border-secondary/20 h-12 rounded-2xl font-semibold hover:bg-secondary/20 transition-all",
+      "ghost": "hover:bg-white/5 text-muted-foreground hover:text-white rounded-xl h-10 px-4",
+      "glass": "bg-white/5 backdrop-blur-md border border-white/10 text-white hover:bg-white/10 h-12 rounded-2xl shadow-sm"
+    },
+    "cards": {
+      "base": "bg-[#0F0720]/80 backdrop-blur-xl border border-white/5 rounded-3xl shadow-xl overflow-hidden relative",
+      "interactive": "group cursor-pointer hover:border-primary/50 transition-colors duration-300",
+      "glass_panel": "bg-black/40 backdrop-blur-2xl border border-white/5 rounded-3xl"
+    },
+    "inputs": {
+      "default": "bg-white/5 border-white/10 focus:border-primary/50 rounded-xl h-12 px-4 text-white placeholder:text-white/20 transition-all"
+    },
+    "navigation": {
+      "bottom_bar": "fixed bottom-0 left-0 right-0 bg-[#030014]/90 backdrop-blur-xl border-t border-white/5 h-20 pb-4 pt-2 z-50 flex justify-around items-center"
+    }
+  },
+  "visual_enhancers": {
+    "glassmorphism": "Use heavily. Create depth by layering glass panels with different opacities.",
+    "neon_glows": "Use colored shadows to simulate neon lights behind cards.",
+    "noise_texture": "Add a subtle SVG noise overlay to the background to reduce banding and add texture.",
+    "confetti": "Use 'canvas-confetti' for reward unlocks."
+  },
+  "image_assets": {
+    "rewards": [
+      {
+        "url": "https://images.unsplash.com/photo-1640901764423-3195244b8e77?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwzfHxnYW1pbmclMjBoZWFkc2V0JTIwc21hcnQlMjB3YXRjaCUyMHRlY2glMjBnYWRnZXR8ZW58MHx8fHwxNzcyODI5MjU5fDA&ixlib=rb-4.1.0&q=85",
+        "category": "gadgets",
+        "description": "Smart Watches / Wearables"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1668069225941-37356a72faac?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2NzR8MHwxfHNlYXJjaHwyfHxnYW1pbmclMjBoZWFkc2V0JTIwc21hcnQlMjB3YXRjaCUyMHRlY2glMjBnYWRnZXR8ZW58MHx8fHwxNzcyODI5MjU5fDA&ixlib=rb-4.1.0&q=85",
+        "category": "gadgets",
+        "description": "Black Minimalist Watch"
+      }
+    ],
+    "crypto": [
+      {
+        "url": "https://images.unsplash.com/photo-1639454276085-9f55d2db6570?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NTY2ODh8MHwxfHNlYXJjaHwxfHwzZCUyMGNvaW4lMjBmbG9hdGluZyUyMGNyeXB0byUyMGJpdGNvaW4lMjBldGhlcmV1bXxlbnwwfHx8fDE3NzI4MjkyNjB8MA&ixlib=rb-4.1.0&q=85",
+        "category": "currency",
+        "description": "Floating 3D Coins"
+      }
+    ],
+    "backgrounds": [
+      {
+        "url": "https://images.unsplash.com/photo-1768527049137-b544e1f80072?crop=entropy&cs=srgb&fm=jpg&ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHw0fHxjeWJlcnB1bmslMjBuZW9uJTIwcHVycGxlJTIwYWJzdHJhY3QlMjBiYWNrZ3JvdW5kJTIwdGV4dHVyZXxlbnwwfHx8fDE3NzI4MjkyNTl8MA&ixlib=rb-4.1.0&q=85",
+        "category": "texture",
+        "description": "Purple Abstract Streaks"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1770520215948-02a1b832ad39?crop=entropy&cs=srgb\u0026fm=jpg\u0026ixid=M3w3NDQ2NDF8MHwxfHNlYXJjaHwyfHxjeWJlcnB1bmslMjBuZW9uJTIwcHVycGxlJTIwYWJzdHJhY3QlMjBiYWNrZ3JvdW5kJTIwdGV4dHVyZXxlbnwwfHx8fDE3NzI4MjkyNTl8MA\u0026ixlib=rb-4.1.0\u0026q=85",
+        "category": "texture",
+        "description": "Wavy Neon Pattern"
+      }
+    ]
+  },
+  "libraries": {
+    "icons": "lucide-react",
+    "charts": "recharts (via shadcn/ui charts)",
+    "animations": "framer-motion",
+    "spin_wheel": "react-spin-wheel (or custom framer-motion impl)",
+    "confetti": "canvas-confetti",
+    "toast": "sonner"
+  },
+  "instructions_to_main_agent": [
+    "1. Setup: Ensure 'framer-motion' and 'lucide-react' are installed.",
+    "2. Theme: Implement the dark mode colors as the DEFAULT. Add a class 'dark' to the HTML tag if needed, but the design should primarily look dark.",
+    "3. Navigation: Build the bottom tab bar FIRST. It is the anchor of the mobile app.",
+    "4. Home Page: Use the 'Bento Grid' layout. Hero section = XP Balance + Level. Small blocks = Streak, Daily Bonus.",
+    "5. Rewards: Use a masonry or grid layout for rewards. Cards must have a glass effect.",
+    "6. Wheel: Create a dedicated page or modal for the spin wheel. Make it feel physics-based.",
+    "7. Streak: Use a horizontal scrollable calendar or a vertical timeline. Mark active days with a 'fire' icon or glowing dot.",
+    "8. Mock Data: Create a robust 'mock_data.js' file with users, missions, and rewards. Do not hardcode data in components."
+  ],
+  "universal_guidelines": [
+    "You tend to converge toward generic, 'on distribution' outputs. In frontend design, this creates what users call the 'AI slop' aesthetic. Avoid this: make creative, distinctive frontends that surprise and delight.",
+    "Dark colors look good when used independently without gradients. DO NOT use dark colors as gradients",
+    "Don't make generic centered layouts, simplistic gradients, and uniform styling.",
+    "Create depth through layered design elements with z-index hierarchy",
+    "Use glass-morphism effects with backdrop filters (12-24px blur)",
+    "You MUST NOT apply universal transition. Eg: 'transition: all'. This results in breaking transforms. Always add transitions for specific interactive elements like button, input excluding transforms",
+    "You MUST NOT center align the app container, ie do not add '.App { text-align: center; }' in the css file. This disrupts the human natural reading flow of text",
+    "Always use modern button styles like pill-shaped, or sharp button with interaction animations & color relevant to the app style",
+    "NEVER: use AI assistant Emoji characters like 🤖🧠💭💡🔮🎯📚🎭🎬🎪🎉🎊🎁🎀🎂🍰🎈🎨🎰💰💵💳🏦💎🪙💸🤑📊📈📉💹🔢🏆🥇 etc for icons.",
+    "Every interaction needs micro-animations - hover states, transitions, parallax effects, and entrance animations. Static = dead.",
+    "Use 2-3x more spacing than feels comfortable. Cramped designs look cheap.",
+    "Subtle grain textures, noise overlays, custom cursors, selection states, and loading animations: separates good from extraordinary.",
+    "Main agent relies on these image URLs. Missing categories (especially sponsor logos) = main agent will use placeholder text which is FORBIDDEN",
+    "Prioritize using pre-existing components from src/components/ui when applicable",
+    "Create new components that match the style and conventions of existing components when needed",
+    "Examine existing components to understand the project's component patterns before creating new ones",
+    "Components MUST use named exports (export const ComponentName = ...)",
+    "Pages MUST use default exports (export default function PageName() {...})",
+    "Use 'sonner' for toasts. Sonner component are located in '/app/src/components/ui/sonner.tsx'"
+  ]
+}

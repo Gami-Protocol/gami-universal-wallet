@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Gami Universal Wallet",
-    "slug": "gami-wallet",
+    "slug": "gami-universal-wallet",
     "scheme": "gamiwallet",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -11,50 +11,25 @@
     "splash": {
       "image": "./assets/images/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0E0E12"
+      "backgroundColor": "#0F0F13"
     },
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.gamiprotocol.universalwallet",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
-      },
-      "bundleIdentifier": "com.gamiprotocol.wallet",
-      "associatedDomains": [
-        "applinks:app.gamiprotocol.com"
-      ]
+      }
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0E0E12"
+        "backgroundColor": "#ffffff"
       },
       "permissions": [
         "android.permission.RECORD_AUDIO",
         "android.permission.MODIFY_AUDIO_SETTINGS"
       ],
-      "package": "com.gamiprotocol.wallet",
-      "intentFilters": [
-        {
-          "action": "VIEW",
-          "autoVerify": true,
-          "data": [
-            {
-              "scheme": "gamiwallet",
-              "host": "oauth",
-              "pathPrefix": "/discord"
-            },
-            {
-              "scheme": "gamiwallet",
-              "host": "oauth",
-              "pathPrefix": "/twitter"
-            }
-          ],
-          "category": [
-            "BROWSABLE",
-            "DEFAULT"
-          ]
-        }
-      ]
+      "package": "com.gamiprotocol.universalwallet"
     },
     "plugins": [
       [
@@ -69,10 +44,18 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
-          "backgroundColor": "#0E0E12"
+          "backgroundColor": "#0F0F13"
         }
       ],
       "expo-audio",
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static"
+          }
+        }
+      ],
       "expo-video",
       "expo-secure-store",
       "expo-web-browser",
@@ -88,16 +71,11 @@
     },
     "extra": {
       "router": {
-        "origin": false,
-        "sitemap": false
-      },
-      "eas": {
-        "projectId": "a34177f8-42ca-48d4-8c87-39f82476418e"
+        "origin": false
       }
     },
     "runtimeVersion": {
       "policy": "appVersion"
-    },
-    "owner": "gami-protocols-organization"
+    }
   }
 }
