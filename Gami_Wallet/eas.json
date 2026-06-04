@@ -21,8 +21,7 @@
       "channel": "testflight",
       "autoIncrement": true,
       "ios": {
-        "resourceClass": "m-medium",
-        "enterpriseProvisioning": "universal"
+        "resourceClass": "m-medium"
       },
       "env": {
         "APP_ENV": "testflight",

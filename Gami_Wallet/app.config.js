@@ -25,6 +25,7 @@ export default ({ config }) => {
       backgroundColor: '#0E0E12',
     },
     ios: {
+      ...config.ios,
       supportsTablet: true,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
@@ -86,6 +87,14 @@ export default ({ config }) => {
         },
       ],
       'expo-audio',
+      [
+        'expo-build-properties',
+        {
+          ios: {
+            useFrameworks: 'static',
+          },
+        },
+      ],
       'expo-video',
       'expo-secure-store',
       'expo-web-browser',
@@ -105,7 +114,7 @@ export default ({ config }) => {
         sitemap: false,
       },
       eas: {
-        projectId: 'a34177f8-42ca-48d4-8c87-39f82476418e',
+        projectId: '65e1fbf7-27fd-499a-a805-b3e69d348f48',
       },
       // Environment configuration
       ENV,
