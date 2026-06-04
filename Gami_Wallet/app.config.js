@@ -12,7 +12,7 @@ export default ({ config }) => {
   return {
     ...config,
     name: IS_PRODUCTION ? 'Gami Wallet' : `Gami Wallet (${ENV})`,
-    slug: 'gami-wallet',
+    slug: 'gami-universal-wallet',
     scheme: 'gamiwallet',
     version: '1.0.0',
     orientation: 'portrait',

@@ -1,7 +1,7 @@
 {
   "expo": {
     "name": "Gami Wallet",
-    "slug": "gami-wallet",
+    "slug": "gami-universal-wallet",
     "owner": "gami-protocols-organization",
     "scheme": "gamiwallet",
     "version": "1.0.0",
