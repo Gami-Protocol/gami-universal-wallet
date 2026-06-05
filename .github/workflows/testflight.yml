@@ -37,8 +37,6 @@ jobs:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       DEPLOY_ENV: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
       EAS_PROFILE: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && 'testflight' || 'production' }}
-      EXPO_PUBLIC_API_URL: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && (secrets.STAGING_EXPO_PUBLIC_API_URL || secrets.STAGING_EXPO_PUBLIC_API_BASE_URL) || (secrets.PRODUCTION_EXPO_PUBLIC_API_URL || secrets.PRODUCTION_EXPO_PUBLIC_API_BASE_URL) }}
-      EXPO_PUBLIC_GAMI_RPC_URL: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_GAMI_RPC_URL || secrets.PRODUCTION_EXPO_PUBLIC_GAMI_RPC_URL }}
       EXPO_PUBLIC_FIREBASE_API_KEY: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_API_KEY || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_API_KEY }}
       EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN }}
       EXPO_PUBLIC_FIREBASE_PROJECT_ID: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_FIREBASE_PROJECT_ID || secrets.PRODUCTION_EXPO_PUBLIC_FIREBASE_PROJECT_ID }}
@@ -60,6 +58,23 @@ jobs:
           echo "Deploy environment: $DEPLOY_ENV"
           echo "EAS profile: $EAS_PROFILE"
           echo "Branch: ${{ github.ref_name }}"
+
+      - name: Resolve API and RPC environment variables
+        env:
+          STAGING_EXPO_PUBLIC_API_URL: ${{ secrets.STAGING_EXPO_PUBLIC_API_URL }}
+          STAGING_EXPO_PUBLIC_API_BASE_URL: ${{ secrets.STAGING_EXPO_PUBLIC_API_BASE_URL }}
+          PRODUCTION_EXPO_PUBLIC_API_URL: ${{ secrets.PRODUCTION_EXPO_PUBLIC_API_URL }}
+          PRODUCTION_EXPO_PUBLIC_API_BASE_URL: ${{ secrets.PRODUCTION_EXPO_PUBLIC_API_BASE_URL }}
+          STAGING_EXPO_PUBLIC_GAMI_RPC_URL: ${{ secrets.STAGING_EXPO_PUBLIC_GAMI_RPC_URL }}
+          PRODUCTION_EXPO_PUBLIC_GAMI_RPC_URL: ${{ secrets.PRODUCTION_EXPO_PUBLIC_GAMI_RPC_URL }}
+        run: |
+          if [ "$DEPLOY_ENV" = "staging" ]; then
+            echo "EXPO_PUBLIC_API_URL=${STAGING_EXPO_PUBLIC_API_URL:-$STAGING_EXPO_PUBLIC_API_BASE_URL}" >> "$GITHUB_ENV"
+            echo "EXPO_PUBLIC_GAMI_RPC_URL=${STAGING_EXPO_PUBLIC_GAMI_RPC_URL}" >> "$GITHUB_ENV"
+          else
+            echo "EXPO_PUBLIC_API_URL=${PRODUCTION_EXPO_PUBLIC_API_URL:-$PRODUCTION_EXPO_PUBLIC_API_BASE_URL}" >> "$GITHUB_ENV"
+            echo "EXPO_PUBLIC_GAMI_RPC_URL=${PRODUCTION_EXPO_PUBLIC_GAMI_RPC_URL}" >> "$GITHUB_ENV"
+          fi
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
