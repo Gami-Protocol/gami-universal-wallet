@@ -44,15 +44,17 @@ npm run android
 
 This app is configured for Expo managed builds with native package IDs:
 
-- iOS bundle identifier: `com.gamiprotocol.universalwallet`
-- Android application ID: `com.gamiprotocol.universalwallet`
+- iOS bundle identifier: `com.gamiprotocol.wallet`
+- Android application ID: `com.gamiprotocol.wallet`
 
 Use EAS to produce store binaries:
 
 ```bash
-eas build --platform ios --profile production
-eas build --platform android --profile production
+npm run eas:build:production:ios
+npm run eas:build:production:android
 ```
+
+The `production` profile in `eas.json` is configured with `distribution: "store"` and `channel: "production"` for app-store ready builds.
 
 ## 📱 Features
 
