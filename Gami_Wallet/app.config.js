@@ -140,7 +140,7 @@ export default ({ config }) => {
       ),
       
       // Blockchain Configuration
-      RPC_URL: process.env.EXPO_PUBLIC_RPC_URL || (
+      RPC_URL: process.env.EXPO_PUBLIC_GAMI_RPC_URL || process.env.EXPO_PUBLIC_RPC_URL || (
         IS_PRODUCTION
           ? 'https://rpc.gamiprotocol.io'
           : IS_TESTNET
