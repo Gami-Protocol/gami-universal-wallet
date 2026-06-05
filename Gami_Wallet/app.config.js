@@ -4,15 +4,21 @@
  */
 
 export default ({ config }) => {
-  // Environment detection
-  const ENV = process.env.EXPO_PUBLIC_ENV || 'development';
+  // Environment detection.
+  // EAS build profiles (eas.json) inject EXPO_PUBLIC_APP_ENV / APP_ENV, so read
+  // those first; EXPO_PUBLIC_ENV is kept as a legacy fallback for local runs.
+  const ENV =
+    process.env.EXPO_PUBLIC_APP_ENV ||
+    process.env.APP_ENV ||
+    process.env.EXPO_PUBLIC_ENV ||
+    'development';
   const IS_PRODUCTION = ENV === 'production';
-  const IS_TESTNET = ENV === 'testnet' || ENV === 'staging';
+  const IS_TESTNET = ['testnet', 'staging', 'testflight', 'preview'].includes(ENV);
 
   return {
     ...config,
     name: IS_PRODUCTION ? 'Gami Wallet' : `Gami Wallet (${ENV})`,
-    slug: 'gami-wallet',
+    slug: 'gami-universal-wallet',
     scheme: 'gamiwallet',
     version: '1.0.0',
     orientation: 'portrait',
@@ -25,6 +31,7 @@ export default ({ config }) => {
       backgroundColor: '#0E0E12',
     },
     ios: {
+      ...config.ios,
       supportsTablet: true,
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
@@ -86,6 +93,14 @@ export default ({ config }) => {
         },
       ],
       'expo-audio',
+      [
+        'expo-build-properties',
+        {
+          ios: {
+            useFrameworks: 'static',
+          },
+        },
+      ],
       'expo-video',
       'expo-secure-store',
       'expo-web-browser',
@@ -105,7 +120,7 @@ export default ({ config }) => {
         sitemap: false,
       },
       eas: {
-        projectId: 'a34177f8-42ca-48d4-8c87-39f82476418e',
+        projectId: '65e1fbf7-27fd-499a-a805-b3e69d348f48',
       },
       // Environment configuration
       ENV,
@@ -143,6 +158,9 @@ export default ({ config }) => {
     },
     runtimeVersion: {
       policy: 'appVersion',
+    },
+    updates: {
+      url: 'https://u.expo.dev/65e1fbf7-27fd-499a-a805-b3e69d348f48',
     },
     owner: 'gami-protocols-organization',
   };

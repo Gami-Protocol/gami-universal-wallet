@@ -9,7 +9,14 @@
     "dev": "tsc --watch",
     "test": "jest",
     "lint": "eslint src --ext .ts",
-    "clean": "rm -rf dist"
+    "clean": "rm -rf dist",
+    "wallet": "npm --prefix Gami_Wallet run",
+    "wallet:start": "npm --prefix Gami_Wallet run start",
+    "wallet:build:ios": "npm --prefix Gami_Wallet run eas:build:ios",
+    "wallet:build:testflight": "npm --prefix Gami_Wallet run eas:build:ios:testflight",
+    "wallet:build:android": "npm --prefix Gami_Wallet run eas:build:android",
+    "wallet:submit:ios": "npm --prefix Gami_Wallet run eas:submit:ios",
+    "wallet:submit:testflight": "npm --prefix Gami_Wallet run eas:submit:ios:testflight"
   },
   "keywords": [
     "gami",
