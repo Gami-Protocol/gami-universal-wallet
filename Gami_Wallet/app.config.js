@@ -4,10 +4,16 @@
  */
 
 export default ({ config }) => {
-  // Environment detection
-  const ENV = process.env.EXPO_PUBLIC_ENV || 'development';
+  // Environment detection.
+  // EAS build profiles (eas.json) inject EXPO_PUBLIC_APP_ENV / APP_ENV, so read
+  // those first; EXPO_PUBLIC_ENV is kept as a legacy fallback for local runs.
+  const ENV =
+    process.env.EXPO_PUBLIC_APP_ENV ||
+    process.env.APP_ENV ||
+    process.env.EXPO_PUBLIC_ENV ||
+    'development';
   const IS_PRODUCTION = ENV === 'production';
-  const IS_TESTNET = ENV === 'testnet' || ENV === 'staging';
+  const IS_TESTNET = ['testnet', 'staging', 'testflight', 'preview'].includes(ENV);
 
   return {
     ...config,
