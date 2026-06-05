@@ -19,7 +19,8 @@ BONUS_BASE_SEGMENTS = [
     {"label": "5 Tokens", "xp": 0, "tokens": 5},
 ]
 MAX_REWARD_COST_FOR_QUALITY = 1000
-DEFAULT_WEBAPP_REPOSITORY = "https://github.com/Gami-Protocol/gami-webapp"
+DEFAULT_CHAIN_REPOSITORY = "https://github.com/Gami-Protocol/gami-protocol-chain"
+DEFAULT_WORMHOLE_BRIDGE_URL = "https://portalbridge.com"
 
 
 def _read_float(env_key: str, default: float) -> float:
@@ -62,16 +63,26 @@ def get_agent_tooling_profile():
 def get_agent_integration_payload(profile):
     """Builds the agent integration contract for web and agent-tooling clients.
 
-    The webapp repository can be overridden with `GAMI_WEBAPP_REPOSITORY`
+    The chain repository can be overridden with `GAMI_CHAIN_REPOSITORY`
     (expected to be an absolute repository URL).
     """
+    chain_repository = os.environ.get("GAMI_CHAIN_REPOSITORY", DEFAULT_CHAIN_REPOSITORY)
+    wormhole_bridge_url = os.environ.get("GAMI_WORMHOLE_BRIDGE_URL", DEFAULT_WORMHOLE_BRIDGE_URL)
     return {
         "enabled": profile["integration_enabled"],
         "integration_mode": profile["mode"],
         "chain": profile["gami_chain"],
-        "webapp_repository": os.environ.get("GAMI_WEBAPP_REPOSITORY", DEFAULT_WEBAPP_REPOSITORY),
+        "chain_repository": chain_repository,
+        "wormhole_bridge": {
+            "enabled": True,
+            "provider": "wormhole",
+            "url": wormhole_bridge_url,
+            "supported_chain_ids": [profile["gami_chain"]["chain_id"], "eth-1", "sol-1"],
+        },
         "features": {
             "agent_to_agent_wallet": True,
+            "agentic_tooling": True,
+            "wormhole_bridge": True,
             "enhanced_rewards": True,
             "enhanced_spin_wheel": True,
         },
@@ -86,6 +97,7 @@ def get_agent_integration_payload(profile):
             "checkin": {"method": "PUT", "path": "/api/user/checkin"},
             "agent_integration": {"method": "GET", "path": "/api/agent/integration"},
             "agent_tooling": {"method": "GET", "path": "/api/agent/tooling"},
+            "agentic_tooling": {"method": "GET", "path": "/api/agent/tooling"},
         },
     }
 

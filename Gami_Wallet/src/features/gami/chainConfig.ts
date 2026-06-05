@@ -2,6 +2,12 @@ import type { GamiChain } from './types';
 
 export const GAMI_CHAIN_ID = Number(process.env.EXPO_PUBLIC_GAMI_CHAIN_ID || 7777777);
 export const GAMI_RPC_URL = process.env.EXPO_PUBLIC_GAMI_RPC_URL || 'https://rpc.gamiprotocol.xyz';
+export const GAMI_CHAIN_REPOSITORY =
+  process.env.EXPO_PUBLIC_GAMI_CHAIN_REPOSITORY || 'https://github.com/Gami-Protocol/gami-protocol-chain';
+export const GAMI_WORMHOLE_BRIDGE_URL =
+  process.env.EXPO_PUBLIC_GAMI_WORMHOLE_BRIDGE_URL || 'https://portalbridge.com';
+export const GAMI_AGENTIC_TOOLING_ENDPOINT =
+  process.env.EXPO_PUBLIC_GAMI_AGENTIC_TOOLING_ENDPOINT || '/api/agent/tooling';
 
 export const GAMI_CHAINS: Record<string, GamiChain> = {
   gamiL2: {

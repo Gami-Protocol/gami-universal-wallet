@@ -38,28 +38,40 @@ class GamificationHelpersTests(unittest.TestCase):
         self.assertEqual(result["xp"], 50)
         self.assertEqual(result["label"], "2x Bonus (25 XP)")
 
-    def test_agent_integration_payload_includes_webapp_and_rewards_endpoints(self):
+    def test_agent_integration_payload_includes_chain_bridge_and_rewards_endpoints(self):
         profile = get_agent_tooling_profile()
         payload = get_agent_integration_payload(profile)
 
-        self.assertEqual(payload["webapp_repository"], "https://github.com/Gami-Protocol/gami-webapp")
+        self.assertEqual(payload["chain_repository"], "https://github.com/Gami-Protocol/gami-protocol-chain")
+        self.assertTrue(payload["wormhole_bridge"]["enabled"])
+        self.assertEqual(payload["wormhole_bridge"]["provider"], "wormhole")
         self.assertEqual(payload["endpoints"]["rewards"]["path"], "/api/rewards")
         self.assertEqual(payload["endpoints"]["rewards_redeem"]["path"], "/api/rewards/redeem")
         self.assertEqual(payload["endpoints"]["agent_tooling"]["path"], "/api/agent/tooling")
+        self.assertEqual(payload["endpoints"]["agentic_tooling"]["path"], "/api/agent/tooling")
 
-    def test_agent_integration_payload_allows_webapp_repository_override(self):
-        with patch.dict("os.environ", {"GAMI_WEBAPP_REPOSITORY": "https://example.com/custom-webapp"}):
+    def test_agent_integration_payload_allows_chain_repository_override(self):
+        with patch.dict(
+            "os.environ",
+            {
+                "GAMI_CHAIN_REPOSITORY": "https://example.com/custom-chain",
+                "GAMI_WORMHOLE_BRIDGE_URL": "https://example.com/wormhole",
+            },
+        ):
             profile = get_agent_tooling_profile()
             payload = get_agent_integration_payload(profile)
-        self.assertEqual(payload["webapp_repository"], "https://example.com/custom-webapp")
+        self.assertEqual(payload["chain_repository"], "https://example.com/custom-chain")
+        self.assertEqual(payload["wormhole_bridge"]["url"], "https://example.com/wormhole")
         self.assertTrue(payload["enabled"])
         self.assertEqual(payload["integration_mode"], profile["mode"])
         self.assertEqual(payload["chain"]["chain_id"], profile["gami_chain"]["chain_id"])
         self.assertTrue(payload["features"]["enhanced_rewards"])
+        self.assertTrue(payload["features"]["agentic_tooling"])
+        self.assertTrue(payload["features"]["wormhole_bridge"])
         self.assertEqual(payload["endpoints"]["spin"]["path"], "/api/spin")
 
         default_payload = get_agent_integration_payload(get_agent_tooling_profile())
-        self.assertEqual(default_payload["webapp_repository"], "https://github.com/Gami-Protocol/gami-webapp")
+        self.assertEqual(default_payload["chain_repository"], "https://github.com/Gami-Protocol/gami-protocol-chain")
 
 
 if __name__ == "__main__":
