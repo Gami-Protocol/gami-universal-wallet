@@ -153,6 +153,9 @@ export default ({ config }) => {
     runtimeVersion: {
       policy: 'appVersion',
     },
+    updates: {
+      url: 'https://u.expo.dev/65e1fbf7-27fd-499a-a805-b3e69d348f48',
+    },
     owner: 'gami-protocols-organization',
   };
 };

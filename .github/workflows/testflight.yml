@@ -20,7 +20,7 @@ on:
       - "app.config.*"
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: testflight-ios-${{ github.ref }}
@@ -72,44 +72,6 @@ jobs:
           else
             npm install
           fi
-
-      - name: Auto increment iOS build number
-        run: |
-          node <<'NODE'
-          const fs = require('fs');
-          const path = 'app.json';
-
-          if (!fs.existsSync(path)) {
-            console.error('app.json not found. Add app.json or implement app.config.js version bump logic.');
-            process.exit(1);
-          }
-
-          const raw = fs.readFileSync(path, 'utf8');
-          const appJson = JSON.parse(raw);
-          appJson.expo = appJson.expo || {};
-          appJson.expo.ios = appJson.expo.ios || {};
-
-          const currentBuildNumber = Number(appJson.expo.ios.buildNumber || 0);
-          const nextBuildNumber = currentBuildNumber + 1;
-
-          appJson.expo.ios.buildNumber = String(nextBuildNumber);
-
-          fs.writeFileSync(path, JSON.stringify(appJson, null, 2) + '\n');
-          console.log(`iOS buildNumber bumped from ${currentBuildNumber} to ${nextBuildNumber}`);
-          NODE
-
-      - name: Commit build number bump
-        run: |
-          if git diff --quiet app.json; then
-            echo "No build number change to commit."
-            exit 0
-          fi
-
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add app.json
-          git commit -m "ci: bump iOS build number [skip ci]"
-          git push
 
       - name: Setup Expo and EAS
         uses: expo/expo-github-action@v8
