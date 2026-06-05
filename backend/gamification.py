@@ -97,6 +97,7 @@ def get_agent_integration_payload(profile):
             "checkin": {"method": "PUT", "path": "/api/user/checkin"},
             "agent_integration": {"method": "GET", "path": "/api/agent/integration"},
             "agent_tooling": {"method": "GET", "path": "/api/agent/tooling"},
+            # Backward-compatible alias used by agentic clients.
             "agentic_tooling": {"method": "GET", "path": "/api/agent/tooling"},
         },
     }
