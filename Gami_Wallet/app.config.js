@@ -10,6 +10,7 @@ export default ({ config }) => {
   const ENV =
     process.env.EXPO_PUBLIC_APP_ENV ||
     process.env.APP_ENV ||
+    process.env.EAS_BUILD_PROFILE ||
     process.env.EXPO_PUBLIC_ENV ||
     'development';
   const IS_PRODUCTION = ENV === 'production';
