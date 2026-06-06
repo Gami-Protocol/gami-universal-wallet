@@ -16,6 +16,8 @@
     "eas:build:ios": "npm run eas:build:production:ios",
     "eas:build:ios:testflight": "eas build --platform ios --profile testflight",
     "eas:build:android": "npm run eas:build:production:android",
+    "eas:build:all": "eas build --platform all --profile production",
+    "eas:build:all:preview": "eas build --platform all --profile preview",
     "eas:build:preview": "eas build --profile preview",
     "eas:submit:ios": "eas submit --platform ios --profile production --latest",
     "eas:submit:ios:testflight": "eas submit --platform ios --profile testflight --latest"

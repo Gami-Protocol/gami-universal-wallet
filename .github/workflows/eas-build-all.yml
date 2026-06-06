@@ -1,0 +1,79 @@
+name: EAS Build – All Platforms
+
+on:
+  workflow_dispatch:
+    inputs:
+      profile:
+        description: "EAS build profile"
+        required: true
+        default: "production"
+        type: choice
+        options:
+          - preview
+          - production
+  push:
+    branches:
+      - main
+    paths:
+      - "Gami_Wallet/**"
+      - "!Gami_Wallet/**.md"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: eas-build-all-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-all:
+    name: Build iOS + Android with EAS
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    defaults:
+      run:
+        working-directory: Gami_Wallet
+
+    env:
+      EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_PROFILE: ${{ github.event.inputs.profile || 'production' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Show build configuration
+        run: |
+          echo "EAS profile: $EAS_PROFILE"
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Triggered by: ${{ github.event_name }}"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: Gami_Wallet/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Setup Expo and EAS
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Validate Expo project
+        run: npx expo-doctor
+
+      - name: Build iOS + Android with EAS
+        run: npx eas-cli@latest build --platform all --profile "$EAS_PROFILE" --non-interactive
