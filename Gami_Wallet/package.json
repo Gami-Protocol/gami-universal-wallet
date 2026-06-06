@@ -19,7 +19,7 @@
     "eas:build:all": "eas build --platform all --profile production",
     "eas:build:all:preview": "eas build --platform all --profile preview",
     "eas:build:preview": "eas build --profile preview",
-    "eas:workflow:run": "npx eas-cli@latest workflow:run create-production-builds.yml",
+    "eas:workflow:run": "npx eas-cli@latest workflow:run .eas/workflows/create-production-builds.yml",
     "eas:submit:ios": "eas submit --platform ios --profile production --latest",
     "eas:submit:ios:testflight": "eas submit --platform ios --profile testflight --latest"
   },
