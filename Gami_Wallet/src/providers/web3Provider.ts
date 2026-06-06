@@ -36,5 +36,5 @@ export const wagmiConfig = createConfig({
 });
 
 export function Web3Provider({ children }: { children: React.ReactNode }) {
-  return <WagmiConfig config={wagmiConfig}>{children}</WagmiConfig>;
+  return React.createElement(WagmiConfig, { config: wagmiConfig }, children);
 }
