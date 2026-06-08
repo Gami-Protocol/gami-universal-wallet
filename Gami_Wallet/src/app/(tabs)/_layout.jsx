@@ -4,7 +4,7 @@ import { View } from "react-native";
 import {
   Home,
   ListChecks,
-  BadgeCheck,
+  User,
   Sparkles,
   Wallet2,
 } from "lucide-react-native";
@@ -92,10 +92,10 @@ export default function TabLayout() {
       <Tabs.Screen
         name="identity"
         options={{
-          title: "Identity",
+          title: "Profile",
           tabBarIcon: ({ color, focused }) => (
             <IconWithGlow focused={focused}>
-              <BadgeCheck size={24} color={color} />
+              <User size={24} color={color} />
             </IconWithGlow>
           ),
         }}
