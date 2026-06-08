@@ -85,6 +85,7 @@ export default ({ config }) => {
       [
         'expo-router',
         {
+          root: 'src',
           sitemap: false,
         },
       ],
