@@ -1,293 +1,213 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-import { AssetCard } from '../../components/wallet/AssetCard';
-import { NeobrutlisTheme } from '../../design/neobrultis-theme';
+import React from 'react';
+import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import * as Clipboard from 'expo-clipboard';
+import {
+  GAMI,
+  FONTS,
+  GlowBlob,
+  BrutalBox,
+  Title,
+  Label,
+  BoltIcon,
+  ArrowIcon,
+  QrIcon,
+  SparkIcon,
+  CopyIcon,
+} from '@/ui';
+import { useProfileStore, levelFromXp } from '@/store/profileStore';
+import { mockTokens, mockNfts, mockTransactions } from '@/features/gami/mockData';
 
-interface WalletStats {
-  level: number;
-  currentXP: number;
-  maxXP: number;
-  totalXP: number;
-}
+const ADDRESS = '0x7f3a9c4e21b8d05f6a7c8e9d0a1b2c3d4e5f6b29';
+const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
 
-interface Asset {
-  id: string;
-  symbol: string;
-  name: string;
-  balance: string;
-  value?: string;
-}
+const QUICK_ACTIONS = [
+  { key: 'send', label: 'Send', icon: (c: string) => <ArrowIcon size={20} color={c} />, color: GAMI.pink },
+  { key: 'receive', label: 'Receive', icon: (c: string) => <QrIcon size={20} color={c} />, color: GAMI.success },
+  { key: 'swap', label: 'Swap', icon: (c: string) => <SparkIcon size={20} color={c} />, color: GAMI.cyan },
+] as const;
 
 export default function WalletScreen() {
-  const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState<WalletStats>({
-    level: 5,
-    currentXP: 3450,
-    maxXP: 5000,
-    totalXP: 18450,
-  });
+  const insets = useSafeAreaInsets();
+  const { xp } = useProfileStore();
+  const totalUsd = mockTokens.reduce((sum, t) => sum + t.usd, 0);
 
-  const [assets] = useState<Asset[]>([
-    { id: '1', symbol: 'ETH', name: 'Ethereum', balance: '2.45', value: '4,850.00' },
-    { id: '2', symbol: 'GAMI', name: 'Gami Token', balance: '1,500', value: '750.00' },
-    { id: '3', symbol: 'USDC', name: 'USD Coin', balance: '1,200', value: '1,200.00' },
-  ]);
-
-  const onRefresh = React.useCallback(async () => {
-    setRefreshing(true);
-    // TODO: Fetch data from API
-    setTimeout(() => {
-      setRefreshing(false);
-    }, 1000);
-  }, []);
+  const copyAddress = () => Clipboard.setStringAsync(ADDRESS).catch(() => {});
 
   return (
-    <SafeAreaView style={styles.container} edges={['top']}>
+    <View style={styles.root}>
+      <StatusBar style="light" />
+      <View style={StyleSheet.absoluteFill} pointerEvents="none">
+        <GlowBlob color={GAMI.purple} size={320} top={-110} right={-80} opacity={0.4} />
+      </View>
+
       <ScrollView
-        style={styles.scrollView}
-        contentContainerStyle={styles.contentContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            tintColor={NeobrutlisTheme.colors.accent.xp}
-            colors={[NeobrutlisTheme.colors.accent.xp]}
-          />
-        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={{ paddingTop: insets.top + 12, paddingBottom: insets.bottom + 28, paddingHorizontal: 20 }}
       >
-        {/* Header */}
-        <View style={styles.header}>
-          <Text style={styles.title}>UNIVERSAL WALLET</Text>
-          <View style={styles.addressContainer}>
-            <Text style={styles.address}>0x1234...5678</Text>
-          </View>
+        <View style={styles.headerRow}>
+          <Title>Wallet</Title>
+          <Pressable onPress={copyAddress} style={styles.addressChip} hitSlop={8}>
+            <Text style={styles.addressText}>{short(ADDRESS)}</Text>
+            <CopyIcon size={13} color={GAMI.purpleLight} />
+          </Pressable>
         </View>
 
-        {/* XP Section - Simplified */}
-        <View style={styles.xpSection}>
-          <View style={styles.xpCard}>
-            <Text style={styles.xpLevel}>LEVEL {stats.level}</Text>
-            <Text style={styles.xpText}>{stats.currentXP.toLocaleString()} / {stats.maxXP.toLocaleString()} XP</Text>
-            <View style={styles.xpBar}>
-              <View style={[styles.xpFill, { width: `${(stats.currentXP / stats.maxXP) * 100}%` }]} />
+        {/* Balance hero */}
+        <Animated.View entering={FadeInDown.duration(360)} style={styles.heroWrap}>
+          <View style={[StyleSheet.absoluteFill, styles.heroShadow]} />
+          <View style={styles.hero}>
+            <Label color="rgba(255,255,255,0.7)">TOTAL BALANCE</Label>
+            <Text style={styles.heroBalance}>
+              ${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+            </Text>
+            <View style={styles.xpPill}>
+              <BoltIcon size={13} color={GAMI.success} />
+              <Text style={styles.xpPillText}>{xp.toLocaleString()} XP · LVL {levelFromXp(xp)}</Text>
             </View>
           </View>
+        </Animated.View>
+
+        {/* Quick actions */}
+        <View style={styles.actions}>
+          {QUICK_ACTIONS.map((a) => (
+            <Pressable key={a.key} style={styles.actionPress} onPress={() => {}}>
+              <BrutalBox fill offset={4} background={GAMI.bgCard} style={styles.actionCard}>
+                <View style={[styles.actionIcon, { backgroundColor: a.color }]}>{a.icon('#000')}</View>
+                <Text style={styles.actionLabel}>{a.label}</Text>
+              </BrutalBox>
+            </Pressable>
+          ))}
         </View>
 
-        {/* Stats Cards */}
-        <View style={styles.statsGrid}>
-          <View style={styles.statCard}>
-            <Text style={styles.statLabel}>TOTAL XP</Text>
-            <Text style={styles.statValue}>{stats.totalXP.toLocaleString()}</Text>
-          </View>
-          <View style={styles.statCard}>
-            <Text style={styles.statLabel}>RANK</Text>
-            <Text style={styles.statValue}>#248</Text>
-          </View>
+        {/* Tokens */}
+        <Label style={styles.section}>TOKENS</Label>
+        <View style={{ gap: 10 }}>
+          {mockTokens.map((t, i) => (
+            <Animated.View key={t.symbol} entering={FadeInDown.delay(i * 50).duration(300)}>
+              <BrutalBox fill offset={4} background={GAMI.bgCard} style={styles.tokenRow}>
+                <View style={[styles.tokenIcon, { backgroundColor: t.color }]}>
+                  <Text style={styles.tokenSym}>{t.symbol.slice(0, 1)}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={styles.tokenName}>{t.name}</Text>
+                  <Text style={styles.tokenBal}>{t.balance} {t.symbol}</Text>
+                </View>
+                <View style={{ alignItems: 'flex-end' }}>
+                  <Text style={styles.tokenUsd}>${t.usd.toLocaleString()}</Text>
+                  <Text style={[styles.tokenChange, { color: t.change24h >= 0 ? GAMI.success : GAMI.pink }]}>
+                    {t.change24h >= 0 ? '▲' : '▼'} {Math.abs(t.change24h).toFixed(1)}%
+                  </Text>
+                </View>
+              </BrutalBox>
+            </Animated.View>
+          ))}
         </View>
 
-        {/* Assets Section */}
-        <View style={styles.assetsSection}>
-          <View style={styles.sectionHeader}>
-            <Text style={styles.sectionTitle}>ASSETS</Text>
-            <Text style={styles.totalValue}>$6,800.00</Text>
-          </View>
-          
-          <View style={styles.assetsList}>
-            {assets.map((asset) => (
-              <AssetCard
-                key={asset.id}
-                symbol={asset.symbol}
-                name={asset.name}
-                balance={asset.balance}
-                value={asset.value}
-                onPress={() => console.log('Asset pressed:', asset.symbol)}
-              />
-            ))}
-          </View>
-        </View>
+        {/* NFTs */}
+        <Label style={styles.section}>COLLECTIBLES</Label>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={{ gap: 12, paddingVertical: 2, paddingRight: 8 }}
+        >
+          {mockNfts.map((n) => (
+            <BrutalBox key={n.id} offset={4} background={GAMI.bgCard} style={styles.nftCard}>
+              <View style={[styles.nftArt, { backgroundColor: n.color }]}>
+                <SparkIcon size={28} color="#000" />
+              </View>
+              <Text style={styles.nftName} numberOfLines={1}>{n.name}</Text>
+              <Text style={styles.nftCollection} numberOfLines={1}>{n.collection}</Text>
+            </BrutalBox>
+          ))}
+        </ScrollView>
 
-        {/* Recent Activity */}
-        <View style={styles.activitySection}>
-          <Text style={styles.sectionTitle}>RECENT ACTIVITY</Text>
-          <View style={styles.activityList}>
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityText}>+50 XP</Text>
-                <Text style={styles.activityTime}>Completed quest · 2h ago</Text>
+        {/* Activity */}
+        <Label style={styles.section}>RECENT ACTIVITY</Label>
+        <BrutalBox fill offset={4} background={GAMI.bgCard} style={{ padding: 6 }}>
+          {mockTransactions.map((tx, i) => (
+            <View key={tx.id} style={[styles.txRow, i < mockTransactions.length - 1 && styles.txDivider]}>
+              <View style={[styles.txIcon, { borderColor: TX_COLOR[tx.kind] }]}>
+                <Text style={[styles.txGlyph, { color: TX_COLOR[tx.kind] }]}>{TX_GLYPH[tx.kind]}</Text>
+              </View>
+              <View style={{ flex: 1 }}>
+                <Text style={styles.txTitle}>{tx.title}</Text>
+                <Text style={styles.txSub}>{tx.subtitle}</Text>
+              </View>
+              <View style={{ alignItems: 'flex-end' }}>
+                <Text style={styles.txAmount}>{tx.amount}</Text>
+                <Text style={styles.txWhen}>{tx.when}</Text>
               </View>
             </View>
-            <View style={styles.activityItem}>
-              <View style={styles.activityDot} />
-              <View style={styles.activityContent}>
-                <Text style={styles.activityText}>+100 XP</Text>
-                <Text style={styles.activityTime}>Website interaction · 5h ago</Text>
-              </View>
-            </View>
-          </View>
-        </View>
+          ))}
+        </BrutalBox>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 }
 
+const TX_COLOR: Record<string, string> = {
+  send: GAMI.pink,
+  receive: GAMI.success,
+  swap: GAMI.cyan,
+  reward: GAMI.warn,
+};
+const TX_GLYPH: Record<string, string> = { send: '↑', receive: '↓', swap: '⇄', reward: '★' };
+
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: NeobrutlisTheme.colors.background.primary,
+  root: { flex: 1, backgroundColor: GAMI.bg },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  addressChip: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    backgroundColor: GAMI.bgElev,
+    borderWidth: 1.5,
+    borderColor: GAMI.borderStrong,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
   },
-  scrollView: {
-    flex: 1,
-  },
-  contentContainer: {
-    padding: NeobrutlisTheme.spacing.lg,
-    gap: NeobrutlisTheme.spacing.xl,
-  },
-  header: {
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  title: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes['3xl'],
-    fontWeight: NeobrutlisTheme.typography.weights.bold,
-    color: NeobrutlisTheme.colors.text.primary,
-    letterSpacing: NeobrutlisTheme.typography.letterSpacing.wider,
-  },
-  addressContainer: {
-    backgroundColor: NeobrutlisTheme.colors.background.secondary,
-    borderWidth: 1,
-    borderColor: NeobrutlisTheme.colors.border.default,
-    borderRadius: NeobrutlisTheme.borderRadius.md,
-    paddingVertical: NeobrutlisTheme.spacing.sm,
-    paddingHorizontal: NeobrutlisTheme.spacing.md,
+  addressText: { fontFamily: FONTS.mono, fontSize: 11, color: GAMI.purpleLight },
+  heroWrap: { position: 'relative', marginTop: 18 },
+  heroShadow: { backgroundColor: GAMI.black, transform: [{ translateX: 6 }, { translateY: 6 }] },
+  hero: { backgroundColor: GAMI.purple, borderWidth: 2.5, borderColor: GAMI.black, padding: 20 },
+  heroBalance: { fontFamily: FONTS.display, fontSize: 40, color: '#fff', marginTop: 6 },
+  xpPill: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
     alignSelf: 'flex-start',
+    backgroundColor: GAMI.black,
+    paddingVertical: 5,
+    paddingHorizontal: 10,
+    marginTop: 12,
   },
-  address: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.sm,
-    color: NeobrutlisTheme.colors.text.secondary,
-  },
-  xpSection: {
-    alignItems: 'center',
-    paddingVertical: NeobrutlisTheme.spacing.lg,
-  },
-  xpCard: {
-    width: '100%',
-    backgroundColor: NeobrutlisTheme.colors.background.secondary,
-    borderWidth: 2,
-    borderColor: NeobrutlisTheme.colors.border.default,
-    borderRadius: NeobrutlisTheme.borderRadius.lg,
-    padding: NeobrutlisTheme.spacing.xl,
-    alignItems: 'center',
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  xpLevel: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes['2xl'],
-    fontWeight: NeobrutlisTheme.typography.weights.bold,
-    color: NeobrutlisTheme.colors.accent.xp,
-  },
-  xpText: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.lg,
-    color: NeobrutlisTheme.colors.text.primary,
-  },
-  xpBar: {
-    width: '100%',
-    height: 12,
-    backgroundColor: NeobrutlisTheme.colors.background.primary,
-    borderRadius: NeobrutlisTheme.borderRadius.full,
-    overflow: 'hidden',
-    borderWidth: 1,
-    borderColor: NeobrutlisTheme.colors.border.default,
-  },
-  xpFill: {
-    height: '100%',
-    backgroundColor: NeobrutlisTheme.colors.accent.xp,
-  },
-  statsGrid: {
-    flexDirection: 'row',
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  statCard: {
-    flex: 1,
-    backgroundColor: NeobrutlisTheme.components.card.backgroundColor,
-    borderWidth: NeobrutlisTheme.components.card.borderWidth,
-    borderColor: NeobrutlisTheme.components.card.borderColor,
-    borderRadius: NeobrutlisTheme.components.card.borderRadius,
-    padding: NeobrutlisTheme.spacing.lg,
-    gap: NeobrutlisTheme.spacing.sm,
-  },
-  statLabel: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.xs,
-    color: NeobrutlisTheme.colors.text.tertiary,
-    letterSpacing: NeobrutlisTheme.typography.letterSpacing.widest,
-  },
-  statValue: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes['2xl'],
-    fontWeight: NeobrutlisTheme.typography.weights.bold,
-    color: NeobrutlisTheme.colors.accent.xp,
-  },
-  assetsSection: {
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  sectionHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  sectionTitle: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.lg,
-    fontWeight: NeobrutlisTheme.typography.weights.bold,
-    color: NeobrutlisTheme.colors.text.primary,
-    letterSpacing: NeobrutlisTheme.typography.letterSpacing.wider,
-  },
-  totalValue: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.xl,
-    fontWeight: NeobrutlisTheme.typography.weights.bold,
-    color: NeobrutlisTheme.colors.accent.points,
-  },
-  assetsList: {
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  activitySection: {
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  activityList: {
-    gap: NeobrutlisTheme.spacing.md,
-  },
-  activityItem: {
-    flexDirection: 'row',
-    alignItems: 'flex-start',
-    gap: NeobrutlisTheme.spacing.md,
-    paddingVertical: NeobrutlisTheme.spacing.sm,
-  },
-  activityDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: NeobrutlisTheme.colors.accent.xp,
-    marginTop: 6,
-  },
-  activityContent: {
-    flex: 1,
-    gap: NeobrutlisTheme.spacing.xs,
-  },
-  activityText: {
-    fontFamily: NeobrutlisTheme.typography.fonts.primary,
-    fontSize: NeobrutlisTheme.typography.sizes.base,
-    fontWeight: NeobrutlisTheme.typography.weights.semibold,
-    color: NeobrutlisTheme.colors.text.primary,
-  },
-  activityTime: {
-    fontFamily: NeobrutlisTheme.typography.fonts.secondary,
-    fontSize: NeobrutlisTheme.typography.sizes.sm,
-    color: NeobrutlisTheme.colors.text.secondary,
-  },
+  xpPillText: { fontFamily: FONTS.monoBold, fontSize: 11, color: GAMI.success },
+  actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
+  actionPress: { flex: 1 },
+  actionCard: { alignItems: 'center', gap: 8, paddingVertical: 14 },
+  actionIcon: { width: 40, height: 40, borderWidth: 2, borderColor: GAMI.black, alignItems: 'center', justifyContent: 'center' },
+  actionLabel: { fontFamily: FONTS.display, fontSize: 13, color: '#fff' },
+  section: { marginTop: 26, marginBottom: 12 },
+  tokenRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 12 },
+  tokenIcon: { width: 40, height: 40, borderWidth: 2, borderColor: GAMI.black, alignItems: 'center', justifyContent: 'center' },
+  tokenSym: { fontFamily: FONTS.display, fontSize: 18, color: '#000' },
+  tokenName: { fontFamily: FONTS.sansSemi, fontSize: 14, color: '#fff' },
+  tokenBal: { fontFamily: FONTS.mono, fontSize: 11, color: 'rgba(255,255,255,0.5)', marginTop: 2 },
+  tokenUsd: { fontFamily: FONTS.display, fontSize: 15, color: '#fff' },
+  tokenChange: { fontFamily: FONTS.mono, fontSize: 11, marginTop: 2 },
+  nftCard: { width: 130, padding: 10 },
+  nftArt: { width: 110, height: 110, borderWidth: 2, borderColor: GAMI.black, alignItems: 'center', justifyContent: 'center' },
+  nftName: { fontFamily: FONTS.display, fontSize: 13, color: '#fff', marginTop: 8 },
+  nftCollection: { fontFamily: FONTS.mono, fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 },
+  txRow: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 10 },
+  txDivider: { borderBottomWidth: 1.5, borderBottomColor: GAMI.black },
+  txIcon: { width: 34, height: 34, backgroundColor: GAMI.black, borderWidth: 1.5, alignItems: 'center', justifyContent: 'center' },
+  txGlyph: { fontFamily: FONTS.monoBold, fontSize: 16 },
+  txTitle: { fontFamily: FONTS.sansSemi, fontSize: 14, color: '#fff' },
+  txSub: { fontFamily: FONTS.mono, fontSize: 10, color: 'rgba(255,255,255,0.45)', marginTop: 2 },
+  txAmount: { fontFamily: FONTS.monoBold, fontSize: 13, color: '#fff' },
+  txWhen: { fontFamily: FONTS.mono, fontSize: 10, color: 'rgba(255,255,255,0.4)', marginTop: 2 },
 });
