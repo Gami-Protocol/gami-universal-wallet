@@ -1,5 +1,6 @@
 import React, { useEffect } from 'react';
 import { View, Text, StyleSheet, Pressable } from 'react-native';
+import * as Notifications from 'expo-notifications';
 import Animated, {
   useSharedValue,
   useAnimatedStyle,
@@ -44,8 +45,17 @@ export function PermsStep({ index, total, onBack, onComplete }: StepProps) {
   }, []);
   const bobStyle = useAnimatedStyle(() => ({ transform: [{ translateY: bob.value }] }));
 
-  const finish = (enabled: boolean) => {
-    setNotificationsEnabled(enabled);
+  const finish = async (enabled: boolean) => {
+    let granted = false;
+    if (enabled) {
+      try {
+        const { status } = await Notifications.requestPermissionsAsync();
+        granted = status === 'granted';
+      } catch {
+        // permission prompt unavailable (e.g. simulator) — continue gracefully
+      }
+    }
+    setNotificationsEnabled(granted);
     addXp(250); // starter pack reward
     onComplete();
   };
