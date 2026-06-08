@@ -16,9 +16,17 @@ export default ({ config }) => {
   const IS_PRODUCTION = ENV === 'production';
   const IS_TESTNET = ['testnet', 'staging', 'testflight', 'preview'].includes(ENV);
 
+  // TestFlight distributes the production App Store record, so a `testflight`
+  // build shares the production app identity (display name + bundle id /
+  // package). Only its runtime env (API URLs, EAS channel) differs — that is
+  // driven separately by eas.json. Other non-prod envs stay suffixed so they
+  // can be installed side-by-side.
+  const USES_PROD_IDENTITY = IS_PRODUCTION || ENV === 'testflight';
+  const APP_ID = 'com.gamiprotocol.wallet';
+
   return {
     ...config,
-    name: IS_PRODUCTION ? 'Gami Wallet' : `Gami Wallet (${ENV})`,
+    name: USES_PROD_IDENTITY ? 'Gami Wallet' : `Gami Wallet (${ENV})`,
     slug: 'gami-universal-wallet',
     scheme: 'gamiwallet',
     version: '1.0.0',
@@ -37,9 +45,7 @@ export default ({ config }) => {
       infoPlist: {
         ITSAppUsesNonExemptEncryption: false,
       },
-      bundleIdentifier: IS_PRODUCTION 
-        ? 'com.gamiprotocol.wallet'
-        : `com.gamiprotocol.wallet.${ENV}`,
+      bundleIdentifier: USES_PROD_IDENTITY ? APP_ID : `${APP_ID}.${ENV}`,
       associatedDomains: [
         'applinks:app.gamiprotocol.com',
         ...(IS_TESTNET ? ['applinks:testnet.gamiprotocol.com'] : []),
@@ -54,9 +60,7 @@ export default ({ config }) => {
         'android.permission.RECORD_AUDIO',
         'android.permission.MODIFY_AUDIO_SETTINGS',
       ],
-      package: IS_PRODUCTION
-        ? 'com.gamiprotocol.wallet'
-        : `com.gamiprotocol.wallet.${ENV}`,
+      package: USES_PROD_IDENTITY ? APP_ID : `${APP_ID}.${ENV}`,
       intentFilters: [
         {
           action: 'VIEW',
