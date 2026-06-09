@@ -18,6 +18,7 @@ import {
 import { mockTokens } from '@/features/gami/mockData';
 import { useTxStore } from '@/store/txStore';
 import { shortAddress } from '@/features/wallet/localWallet';
+import { sendNative, NATIVE_SYMBOL } from '@/features/wallet/chainClient';
 
 const isAddress = (a: string) => /^0x[a-fA-F0-9]{40}$/.test(a.trim());
 const balanceOf = (sym: string) => Number((mockTokens.find((t) => t.symbol === sym)?.balance ?? '0').replace(/,/g, ''));
@@ -38,10 +39,21 @@ export default function SendScreen() {
   const validAmt = amt > 0 && amt <= bal;
   const canSend = validTo && validAmt && !done;
 
-  const send = () => {
-    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
-    addTx({ kind: 'send', title: `Sent ${token}`, subtitle: `to ${shortAddress(to)}`, amount: `-${amount} ${token}` });
+  const send = async () => {
     setDone(true);
+    let subtitle = `to ${shortAddress(to)}`;
+    // Best-effort on-chain broadcast for the native token; falls back to a local
+    // record when no RPC/funds are available.
+    if (token === NATIVE_SYMBOL) {
+      try {
+        const hash = await sendNative(to as `0x${string}`, amount);
+        subtitle = `to ${shortAddress(to)} · ${shortAddress(hash)}`;
+      } catch {
+        /* offline / unfunded — record locally */
+      }
+    }
+    Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success).catch(() => {});
+    addTx({ kind: 'send', title: `Sent ${token}`, subtitle, amount: `-${amount} ${token}` });
     setTimeout(() => router.back(), 1100);
   };
 

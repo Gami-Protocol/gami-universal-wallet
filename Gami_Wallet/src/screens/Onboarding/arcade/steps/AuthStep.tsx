@@ -12,6 +12,7 @@ import {
 } from '../components';
 import { GAMI, FONTS } from '../tokens';
 import { useOnboardingStore } from '../onboardingStore';
+import { useWallet } from '@/features/wallet/localWallet';
 import type { StepProps } from './types';
 
 export function AuthStep({ index, total, onNext, onBack }: StepProps) {
@@ -19,6 +20,10 @@ export function AuthStep({ index, total, onNext, onBack }: StepProps) {
 
   const choose = (method: Parameters<typeof setAuthMethod>[0]) => {
     setAuthMethod(method);
+    // Provision the real non-custodial wallet now so the rest of the app has a
+    // live address. (Google/Apple still create a wallet here; full OAuth
+    // linking requires provider client IDs configured via EAS env vars.)
+    useWallet.getState().init();
     onNext();
   };
 

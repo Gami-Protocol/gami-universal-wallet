@@ -19,8 +19,9 @@ import {
   CopyIcon,
 } from '@/ui';
 import { useProfileStore, levelFromXp } from '@/store/profileStore';
-import { mockTokens, mockNfts } from '@/features/gami/mockData';
 import { useWallet, shortAddress } from '@/features/wallet/localWallet';
+import { useTokens, useNfts } from '@/features/gami/useGamiData';
+import { useNativeBalance } from '@/features/wallet/useWalletData';
 import { useTxStore } from '@/store/txStore';
 
 const QUICK_ACTIONS = [
@@ -34,8 +35,11 @@ export default function WalletScreen() {
   const router = useRouter();
   const { xp } = useProfileStore();
   const { address, ready, init } = useWallet();
+  const { data: tokens } = useTokens(address ?? undefined);
+  const { data: nfts } = useNfts(address ?? undefined);
+  const { balance: nativeBalance, symbol: nativeSymbol } = useNativeBalance();
   const txs = useTxStore((s) => s.txs);
-  const totalUsd = mockTokens.reduce((sum, t) => sum + t.usd, 0);
+  const totalUsd = tokens.reduce((sum, t) => sum + t.usd, 0);
 
   useEffect(() => {
     if (!ready) init();
@@ -72,9 +76,16 @@ export default function WalletScreen() {
             <Text style={styles.heroBalance}>
               ${totalUsd.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
             </Text>
-            <View style={styles.xpPill}>
-              <BoltIcon size={13} color={GAMI.success} />
-              <Text style={styles.xpPillText}>{xp.toLocaleString()} XP · LVL {levelFromXp(xp)}</Text>
+            <View style={styles.heroPills}>
+              <View style={styles.xpPill}>
+                <BoltIcon size={13} color={GAMI.success} />
+                <Text style={styles.xpPillText}>{xp.toLocaleString()} XP · LVL {levelFromXp(xp)}</Text>
+              </View>
+              {nativeBalance != null && (
+                <View style={styles.xpPill}>
+                  <Text style={styles.xpPillText}>⛓ {Number(nativeBalance).toFixed(4)} {nativeSymbol}</Text>
+                </View>
+              )}
             </View>
           </View>
         </Animated.View>
@@ -94,7 +105,7 @@ export default function WalletScreen() {
         {/* Tokens */}
         <Label style={styles.section}>TOKENS</Label>
         <View style={{ gap: 10 }}>
-          {mockTokens.map((t, i) => (
+          {tokens.map((t, i) => (
             <Animated.View key={t.symbol} entering={FadeInDown.delay(i * 50).duration(300)}>
               <BrutalBox fill offset={4} background={GAMI.bgCard} style={styles.tokenRow}>
                 <View style={[styles.tokenIcon, { backgroundColor: t.color }]}>
@@ -122,7 +133,7 @@ export default function WalletScreen() {
           showsHorizontalScrollIndicator={false}
           contentContainerStyle={{ gap: 12, paddingVertical: 2, paddingRight: 8 }}
         >
-          {mockNfts.map((n) => (
+          {nfts.map((n) => (
             <BrutalBox key={n.id} offset={4} background={GAMI.bgCard} style={styles.nftCard}>
               <View style={[styles.nftArt, { backgroundColor: n.color }]}>
                 <SparkIcon size={28} color="#000" />
@@ -183,6 +194,7 @@ const styles = StyleSheet.create({
   heroShadow: { backgroundColor: GAMI.black, transform: [{ translateX: 6 }, { translateY: 6 }] },
   hero: { backgroundColor: GAMI.purple, borderWidth: 2.5, borderColor: GAMI.black, padding: 20 },
   heroBalance: { fontFamily: FONTS.display, fontSize: 40, color: '#fff', marginTop: 6 },
+  heroPills: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginTop: 12 },
   xpPill: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -191,7 +203,6 @@ const styles = StyleSheet.create({
     backgroundColor: GAMI.black,
     paddingVertical: 5,
     paddingHorizontal: 10,
-    marginTop: 12,
   },
   xpPillText: { fontFamily: FONTS.monoBold, fontSize: 11, color: GAMI.success },
   actions: { flexDirection: 'row', gap: 10, marginTop: 16 },
