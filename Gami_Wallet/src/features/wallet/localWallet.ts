@@ -56,3 +56,9 @@ export function getAccount() {
 
 export const shortAddress = (a?: string | null) =>
   a ? `${a.slice(0, 6)}…${a.slice(-4)}` : '—';
+
+export async function clearWalletSession() {
+  account = null;
+  await SecureStore.deleteItemAsync(PK_KEY);
+  useWallet.setState({ address: null, ready: false, error: null });
+}
