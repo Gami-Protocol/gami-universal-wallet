@@ -1,3 +1,5 @@
+// Crypto entropy must be installed before any wallet/crypto code runs.
+import 'react-native-get-random-values';
 import 'react-native-url-polyfill/auto';
 import './src/__create/polyfills';
 global.Buffer = require('buffer').Buffer;
