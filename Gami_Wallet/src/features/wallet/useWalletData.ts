@@ -8,9 +8,11 @@ import { useQuery } from '@tanstack/react-query';
 import { useWallet } from './localWallet';
 import { fetchNativeBalance, fetchErc20Balance, NATIVE_SYMBOL } from './chainClient';
 import { CHAIN_TOKENS } from './tokenList';
+import { fetchPrices, type TokenPrice } from './priceService';
 import { mockTokens, type MockToken } from '@/features/gami/mockData';
 
 const REFRESH_MS = 15_000;
+const PRICE_REFRESH_MS = 60_000;
 
 /** Mock-derived unit price (USD per token) used to estimate USD value of a real balance. */
 const unitPrice = (t: MockToken) => {
@@ -37,12 +39,33 @@ export function useNativeBalance() {
   return { balance: query.data ?? null, symbol: NATIVE_SYMBOL, isLoading: query.isLoading };
 }
 
+/** Live USD prices (+24h change) keyed by token symbol; empty when unavailable. */
+export function usePrices() {
+  const query = useQuery({
+    queryKey: ['prices'],
+    retry: 0,
+    refetchInterval: PRICE_REFRESH_MS,
+    staleTime: PRICE_REFRESH_MS - 1,
+    queryFn: async () => {
+      try {
+        return await fetchPrices();
+      } catch {
+        return {} as Record<string, TokenPrice>;
+      }
+    },
+  });
+  return { prices: query.data ?? {}, isLive: !!query.data && Object.keys(query.data).length > 0 };
+}
+
 /**
  * Real-time token list: on-chain balances (native + ERC-20) merged over the
- * demo token metadata. Symbols without an on-chain source keep their mock value.
+ * demo token metadata, valued with the live price feed. Symbols without an
+ * on-chain source keep their mock balance; symbols without a live price use a
+ * mock-derived unit price.
  */
 export function useWalletTokens() {
   const { address } = useWallet();
+  const { prices, isLive: pricesLive } = usePrices();
 
   const query = useQuery({
     queryKey: ['walletTokens', address],
@@ -70,12 +93,20 @@ export function useWalletTokens() {
 
   const tokens: MockToken[] = mockTokens.map((mt) => {
     const onchain = live[mt.symbol];
-    if (onchain == null) return mt;
-    const bal = Number(onchain);
+    const price = prices[mt.symbol];
+
+    // balance: real when on-chain, otherwise the demo balance
+    const balNum = onchain != null ? Number(onchain) : Number(mt.balance.replace(/,/g, '')) || 0;
+    const balance = onchain != null ? balNum.toLocaleString(undefined, { maximumFractionDigits: 4 }) : mt.balance;
+
+    // value with the live unit price when available, else mock-derived price
+    const unit = price?.usd ?? unitPrice(mt);
+
     return {
       ...mt,
-      balance: bal.toLocaleString(undefined, { maximumFractionDigits: 4 }),
-      usd: unitPrice(mt) * bal,
+      balance,
+      usd: unit * balNum,
+      change24h: price?.change ?? mt.change24h,
     };
   });
 
@@ -83,6 +114,7 @@ export function useWalletTokens() {
     tokens,
     totalUsd: tokens.reduce((sum, t) => sum + t.usd, 0),
     isLive: Object.keys(live).length > 0,
+    pricesLive,
     isLoading: query.isLoading,
   };
 }

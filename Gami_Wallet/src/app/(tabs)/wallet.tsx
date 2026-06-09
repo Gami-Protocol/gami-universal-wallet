@@ -35,7 +35,7 @@ export default function WalletScreen() {
   const router = useRouter();
   const { xp } = useProfileStore();
   const { address, ready, init } = useWallet();
-  const { tokens, totalUsd, isLive } = useWalletTokens();
+  const { tokens, totalUsd, isLive, pricesLive } = useWalletTokens();
   const { data: nfts } = useNfts(address ?? undefined);
   const txs = useTxStore((s) => s.txs);
 
@@ -79,9 +79,11 @@ export default function WalletScreen() {
                 <BoltIcon size={13} color={GAMI.success} />
                 <Text style={styles.xpPillText}>{xp.toLocaleString()} XP · LVL {levelFromXp(xp)}</Text>
               </View>
-              {isLive && (
+              {(isLive || pricesLive) && (
                 <View style={styles.xpPill}>
-                  <Text style={[styles.xpPillText, { color: GAMI.cyan }]}>● LIVE ON-CHAIN</Text>
+                  <Text style={[styles.xpPillText, { color: GAMI.cyan }]}>
+                    ● {isLive ? 'LIVE ON-CHAIN' : 'LIVE PRICES'}
+                  </Text>
                 </View>
               )}
             </View>
