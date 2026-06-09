@@ -10,6 +10,7 @@ import {
   http,
   defineChain,
   formatEther,
+  formatUnits,
   parseEther,
 } from 'viem';
 import { DEFAULT_GAMI_CHAIN } from '@/features/gami/chainConfig';
@@ -36,6 +37,32 @@ export const publicClient = createPublicClient({ chain: activeChain, transport: 
 export async function fetchNativeBalance(address: `0x${string}`): Promise<string> {
   const wei = await publicClient.getBalance({ address });
   return formatEther(wei);
+}
+
+/** Minimal ERC-20 ABI — just what we need to read balances. */
+export const ERC20_ABI = [
+  {
+    name: 'balanceOf',
+    type: 'function',
+    stateMutability: 'view',
+    inputs: [{ name: 'account', type: 'address' }],
+    outputs: [{ name: '', type: 'uint256' }],
+  },
+] as const;
+
+/** ERC-20 token balance for an owner, formatted with the token's decimals. */
+export async function fetchErc20Balance(
+  owner: `0x${string}`,
+  token: `0x${string}`,
+  decimals: number,
+): Promise<string> {
+  const raw = (await publicClient.readContract({
+    address: token,
+    abi: ERC20_ABI,
+    functionName: 'balanceOf',
+    args: [owner],
+  })) as bigint;
+  return formatUnits(raw, decimals);
 }
 
 /** Broadcast a native-token transfer. Throws if the wallet isn't ready or no RPC. */
