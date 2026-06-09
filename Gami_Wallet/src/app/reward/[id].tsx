@@ -26,14 +26,14 @@ import {
   BoltIcon,
   SparkIcon,
 } from '@/ui';
-import { getMockQuest } from '@/features/gami/mockData';
+import { useQuest } from '@/features/gami/useGamiData';
 import { useProfileStore } from '@/store/profileStore';
 
 export default function RewardRevealScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const quest = getMockQuest(String(id));
+  const quest = useQuest(String(id));
   const xpReward = quest?.xpReward ?? 250;
   const pointReward = quest?.pointReward ?? 25;
 

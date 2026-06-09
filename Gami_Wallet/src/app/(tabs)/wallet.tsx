@@ -1,7 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { useRouter, type Href } from 'expo-router';
 import Animated, { FadeInDown } from 'react-native-reanimated';
 import * as Clipboard from 'expo-clipboard';
 import {
@@ -18,23 +19,31 @@ import {
   CopyIcon,
 } from '@/ui';
 import { useProfileStore, levelFromXp } from '@/store/profileStore';
-import { mockTokens, mockNfts, mockTransactions } from '@/features/gami/mockData';
-
-const ADDRESS = '0x7f3a9c4e21b8d05f6a7c8e9d0a1b2c3d4e5f6b29';
-const short = (a: string) => `${a.slice(0, 6)}…${a.slice(-4)}`;
+import { mockTokens, mockNfts } from '@/features/gami/mockData';
+import { useWallet, shortAddress } from '@/features/wallet/localWallet';
+import { useTxStore } from '@/store/txStore';
 
 const QUICK_ACTIONS = [
-  { key: 'send', label: 'Send', icon: (c: string) => <ArrowIcon size={20} color={c} />, color: GAMI.pink },
-  { key: 'receive', label: 'Receive', icon: (c: string) => <QrIcon size={20} color={c} />, color: GAMI.success },
-  { key: 'swap', label: 'Swap', icon: (c: string) => <SparkIcon size={20} color={c} />, color: GAMI.cyan },
+  { key: 'send', label: 'Send', route: '/send' as Href, icon: (c: string) => <ArrowIcon size={20} color={c} />, color: GAMI.pink },
+  { key: 'receive', label: 'Receive', route: '/receive' as Href, icon: (c: string) => <QrIcon size={20} color={c} />, color: GAMI.success },
+  { key: 'swap', label: 'Swap', route: '/swap' as Href, icon: (c: string) => <SparkIcon size={20} color={c} />, color: GAMI.cyan },
 ] as const;
 
 export default function WalletScreen() {
   const insets = useSafeAreaInsets();
+  const router = useRouter();
   const { xp } = useProfileStore();
+  const { address, ready, init } = useWallet();
+  const txs = useTxStore((s) => s.txs);
   const totalUsd = mockTokens.reduce((sum, t) => sum + t.usd, 0);
 
-  const copyAddress = () => Clipboard.setStringAsync(ADDRESS).catch(() => {});
+  useEffect(() => {
+    if (!ready) init();
+  }, [ready, init]);
+
+  const copyAddress = () => {
+    if (address) Clipboard.setStringAsync(address).catch(() => {});
+  };
 
   return (
     <View style={styles.root}>
@@ -50,7 +59,7 @@ export default function WalletScreen() {
         <View style={styles.headerRow}>
           <Title>Wallet</Title>
           <Pressable onPress={copyAddress} style={styles.addressChip} hitSlop={8}>
-            <Text style={styles.addressText}>{short(ADDRESS)}</Text>
+            <Text style={styles.addressText}>{shortAddress(address)}</Text>
             <CopyIcon size={13} color={GAMI.purpleLight} />
           </Pressable>
         </View>
@@ -73,7 +82,7 @@ export default function WalletScreen() {
         {/* Quick actions */}
         <View style={styles.actions}>
           {QUICK_ACTIONS.map((a) => (
-            <Pressable key={a.key} style={styles.actionPress} onPress={() => {}}>
+            <Pressable key={a.key} style={styles.actionPress} onPress={() => router.push(a.route)}>
               <BrutalBox fill offset={4} background={GAMI.bgCard} style={styles.actionCard}>
                 <View style={[styles.actionIcon, { backgroundColor: a.color }]}>{a.icon('#000')}</View>
                 <Text style={styles.actionLabel}>{a.label}</Text>
@@ -127,8 +136,8 @@ export default function WalletScreen() {
         {/* Activity */}
         <Label style={styles.section}>RECENT ACTIVITY</Label>
         <BrutalBox fill offset={4} background={GAMI.bgCard} style={{ padding: 6 }}>
-          {mockTransactions.map((tx, i) => (
-            <View key={tx.id} style={[styles.txRow, i < mockTransactions.length - 1 && styles.txDivider]}>
+          {txs.map((tx, i) => (
+            <View key={tx.id} style={[styles.txRow, i < txs.length - 1 && styles.txDivider]}>
               <View style={[styles.txIcon, { borderColor: TX_COLOR[tx.kind] }]}>
                 <Text style={[styles.txGlyph, { color: TX_COLOR[tx.kind] }]}>{TX_GLYPH[tx.kind]}</Text>
               </View>

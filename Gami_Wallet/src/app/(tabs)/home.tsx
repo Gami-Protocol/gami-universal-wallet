@@ -28,16 +28,18 @@ import {
   xpIntoLevel,
   XP_PER_LEVEL,
 } from '@/store/profileStore';
-import { mockQuests, mockLeaderboard } from '@/features/gami/mockData';
+import { mockLeaderboard } from '@/features/gami/mockData';
+import { useQuestFeed } from '@/features/gami/useGamiData';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { handle, avatarIndex, xp, streakDays, points } = useProfileStore();
 
+  const { quests } = useQuestFeed();
   const level = levelFromXp(xp);
   const avatar = AVATARS[avatarIndex] ?? AVATARS[0];
-  const activeQuests = mockQuests.filter((q) => q.status !== 'locked').slice(0, 3);
+  const activeQuests = quests.filter((q) => q.status !== 'locked').slice(0, 3);
 
   return (
     <View style={styles.root}>
