@@ -38,6 +38,8 @@ jobs:
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
       EAS_PROFILE: ${{ github.event.inputs.profile || 'production' }}
+      EAS_PROJECT_ID: 65e1fbf7-27fd-499a-a805-b3e69d348f48
+      EAS_BUILD_NO_EXPO_GO_WARNING: "true"
 
     steps:
       - name: Checkout repository
@@ -74,6 +76,9 @@ jobs:
 
       - name: Validate Expo project
         run: npx expo-doctor
+
+      - name: Ensure EAS project is linked
+        run: npx eas-cli@latest init --id "$EAS_PROJECT_ID" --force --non-interactive
 
       - name: Build iOS + Android with EAS
         run: npx eas-cli@latest build --platform all --profile "$EAS_PROFILE" --non-interactive

@@ -38,6 +38,8 @@ jobs:
 
     env:
       EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      EAS_PROJECT_ID: 65e1fbf7-27fd-499a-a805-b3e69d348f48
+      EAS_BUILD_NO_EXPO_GO_WARNING: "true"
       DEPLOY_ENV: ${{ github.event.inputs.environment || (github.ref_name == 'main' && 'production' || 'staging') }}
       EAS_PROFILE: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && 'testflight' || 'production' }}
       EXPO_PUBLIC_API_BASE_URL: ${{ (github.event.inputs.environment == 'staging' || github.ref_name == 'develop') && secrets.STAGING_EXPO_PUBLIC_API_BASE_URL || secrets.PRODUCTION_EXPO_PUBLIC_API_BASE_URL }}
@@ -86,6 +88,9 @@ jobs:
 
       - name: Validate Expo project
         run: npx expo-doctor
+
+      - name: Ensure EAS project is linked
+        run: npx eas-cli@latest init --id "$EAS_PROJECT_ID" --force --non-interactive
 
       - name: Build iOS app with EAS
         run: eas build --platform ios --profile "$EAS_PROFILE" --non-interactive
