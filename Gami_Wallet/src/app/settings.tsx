@@ -8,6 +8,7 @@ import { GAMI, FONTS, BrutalBox, Title, Label, ChevronLeftIcon, ArrowIcon } from
 import { useProfileStore } from '@/store/profileStore';
 import { useWallet, shortAddress } from '@/features/wallet/localWallet';
 import { useSettingsStore, type BoolSetting, type NovaPersonality } from '@/store/settingsStore';
+import { authenticate } from '@/features/auth/biometrics';
 
 const NOVA_CYCLE: NovaPersonality[] = ['Hype', 'Chill', 'Pro'];
 const ONBOARDING_COMPLETED_KEY = '@onboarding_completed';
@@ -26,6 +27,14 @@ export default function SettingsScreen() {
   const { handle } = useProfileStore();
   const { address } = useWallet();
   const s = useSettingsStore();
+
+  const toggleFaceId = async () => {
+    if (!s.faceId) {
+      const ok = await authenticate('Enable Face ID lock');
+      if (!ok) return;
+    }
+    s.toggle('faceId');
+  };
 
   const cycleNova = () => {
     const next = NOVA_CYCLE[(NOVA_CYCLE.indexOf(s.novaPersonality) + 1) % NOVA_CYCLE.length];
@@ -66,7 +75,7 @@ export default function SettingsScreen() {
 
         {/* Security */}
         <Section title="▸ SECURITY" color={GAMI.pink}>
-          <ToggleRow label="Face ID lock" on={s.faceId} onToggle={() => s.toggle('faceId')} />
+          <ToggleRow label="Face ID lock" on={s.faceId} onToggle={toggleFaceId} />
           <Row label="Auto-lock" value={s.autoLock} />
           <Row label="Backup phrase" value="Not backed up" warn />
           <ToggleRow label="Hide balances" on={s.hideBalances} onToggle={() => s.toggle('hideBalances')} last />

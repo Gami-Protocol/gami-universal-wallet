@@ -30,7 +30,7 @@ import {
   xpIntoLevel,
   XP_PER_LEVEL,
 } from '@/store/profileStore';
-import { mockLeaderboard } from '@/features/gami/mockData';
+import { useLeaderboard } from '@/features/gami/useGamiData';
 import { useWallet, shortAddress } from '@/features/wallet/localWallet';
 
 const BADGES = [
@@ -58,9 +58,10 @@ export default function ProfileScreen() {
     if (!ready) init();
   }, [ready, init]);
 
+  const { data: leaders } = useLeaderboard();
   const level = levelFromXp(xp);
   const avatar = AVATARS[avatarIndex] ?? AVATARS[0];
-  const rank = mockLeaderboard.find((r) => r.you)?.rank ?? 412;
+  const rank = leaders.find((r) => r.you)?.rank ?? 412;
   const earned = BADGES.filter((b) => b.earned).length;
 
   return (

@@ -99,6 +99,12 @@ export default ({ config }) => {
       ],
       'expo-audio',
       [
+        'expo-local-authentication',
+        {
+          faceIDPermission: 'Allow Gami Wallet to use Face ID to unlock your wallet.',
+        },
+      ],
+      [
         'expo-build-properties',
         {
           ios: {

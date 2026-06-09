@@ -28,8 +28,7 @@ import {
   xpIntoLevel,
   XP_PER_LEVEL,
 } from '@/store/profileStore';
-import { mockLeaderboard } from '@/features/gami/mockData';
-import { useQuestFeed } from '@/features/gami/useGamiData';
+import { useQuestFeed, useLeaderboard } from '@/features/gami/useGamiData';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
@@ -37,6 +36,7 @@ export default function HomeScreen() {
   const { handle, avatarIndex, xp, streakDays, points } = useProfileStore();
 
   const { quests } = useQuestFeed();
+  const { data: leaders } = useLeaderboard();
   const level = levelFromXp(xp);
   const avatar = AVATARS[avatarIndex] ?? AVATARS[0];
   const activeQuests = quests.filter((q) => q.status !== 'locked').slice(0, 3);
@@ -136,7 +136,7 @@ export default function HomeScreen() {
         {/* Mini leaderboard */}
         <SectionHeader title="LEADERBOARD" actionLabel="GLOBAL ▸" />
         <BrutalBox fill offset={4} background={GAMI.bgCard} style={{ padding: 6 }}>
-          {mockLeaderboard.map((r) => (
+          {leaders.map((r) => (
             <View
               key={r.rank}
               style={[

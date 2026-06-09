@@ -19,6 +19,7 @@ import {
 } from '../components';
 import { GAMI, FONTS } from '../tokens';
 import { useOnboardingStore } from '../onboardingStore';
+import { authenticate } from '@/features/auth/biometrics';
 import type { StepProps } from './types';
 
 export function BiometricStep({ index, total, onNext, onBack }: StepProps) {
@@ -41,8 +42,9 @@ export function BiometricStep({ index, total, onNext, onBack }: StepProps) {
   const spinStyle = useAnimatedStyle(() => ({ transform: [{ rotate: `${spin.value}deg` }] }));
   const bobStyle = useAnimatedStyle(() => ({ transform: [{ translateY: bob.value }] }));
 
-  const enable = () => {
-    setBiometricEnabled(true);
+  const enable = async () => {
+    const ok = await authenticate('Enable Face ID for Gami Wallet');
+    setBiometricEnabled(ok);
     onNext();
   };
 
