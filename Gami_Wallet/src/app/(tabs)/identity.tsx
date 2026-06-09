@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { View, Text, ScrollView, Pressable, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
@@ -31,8 +31,7 @@ import {
   XP_PER_LEVEL,
 } from '@/store/profileStore';
 import { mockLeaderboard } from '@/features/gami/mockData';
-
-const ADDRESS = '0x7f3a…b29c';
+import { useWallet, shortAddress } from '@/features/wallet/localWallet';
 
 const BADGES = [
   { emoji: '🏆', label: 'STARTER', earned: true, bg: GAMI.warn },
@@ -53,6 +52,11 @@ export default function ProfileScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { handle, avatarIndex, xp, points, streakDays, interests } = useProfileStore();
+  const { address, ready, init } = useWallet();
+
+  useEffect(() => {
+    if (!ready) init();
+  }, [ready, init]);
 
   const level = levelFromXp(xp);
   const avatar = AVATARS[avatarIndex] ?? AVATARS[0];
@@ -84,7 +88,7 @@ export default function ProfileScreen() {
             <Avatar name={avatar.name} size={68} bg={avatar.bg} />
             <View style={{ flex: 1 }}>
               <Display style={{ fontSize: 22 }}>@{handle}</Display>
-              <Text style={styles.subId}>{handle}.gami · {ADDRESS}</Text>
+              <Text style={styles.subId}>{handle}.gami · {shortAddress(address)}</Text>
               <View style={styles.idPills}>
                 <Pill label={`${streakDays}d streak`} icon={<FlameIcon size={11} color={GAMI.pink} />} style={styles.darkPill} />
                 <Pill label="Starter" icon={<TrophyIcon size={11} color={GAMI.warn} />} style={styles.darkPill} />

@@ -6,6 +6,7 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GAMI, FONTS, BrutalBox, Title, Label, ChevronLeftIcon, ArrowIcon } from '@/ui';
 import { useProfileStore } from '@/store/profileStore';
+import { useWallet, shortAddress } from '@/features/wallet/localWallet';
 import { useSettingsStore, type BoolSetting, type NovaPersonality } from '@/store/settingsStore';
 
 const NOVA_CYCLE: NovaPersonality[] = ['Hype', 'Chill', 'Pro'];
@@ -23,6 +24,7 @@ export default function SettingsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { handle } = useProfileStore();
+  const { address } = useWallet();
   const s = useSettingsStore();
 
   const cycleNova = () => {
@@ -59,7 +61,7 @@ export default function SettingsScreen() {
         <Section title="▸ ACCOUNT" color={GAMI.purpleLight}>
           <Row label="Display name" value={`@${handle}`} action="EDIT" />
           <Row label="Email" value={`${handle}@gami.xyz`} action="EDIT" />
-          <Row label="Wallet address" value="0x7f3a…b29c" action="COPY" last />
+          <Row label="Wallet address" value={shortAddress(address)} action="COPY" last />
         </Section>
 
         {/* Security */}

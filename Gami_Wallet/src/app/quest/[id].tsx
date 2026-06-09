@@ -20,13 +20,13 @@ import {
   CheckIcon,
   TrophyIcon,
 } from '@/ui';
-import { getMockQuest } from '@/features/gami/mockData';
+import { useQuest } from '@/features/gami/useGamiData';
 
 export default function QuestDetailScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
-  const quest = getMockQuest(String(id));
+  const quest = useQuest(String(id));
 
   if (!quest) {
     return (

@@ -17,7 +17,8 @@ import {
   ArrowIcon,
   SparkIcon,
 } from '@/ui';
-import { mockQuests, QUEST_FILTERS, type QuestFilter } from '@/features/gami/mockData';
+import { QUEST_FILTERS, type QuestFilter } from '@/features/gami/mockData';
+import { useQuestFeed } from '@/features/gami/useGamiData';
 import type { GamiQuest } from '@/features/gami/types';
 
 const FILTER_COLOR: Record<QuestFilter, string> = {
@@ -30,8 +31,9 @@ export default function QuestsScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const [filter, setFilter] = useState<QuestFilter>('daily');
+  const { quests: all } = useQuestFeed();
 
-  const quests = useMemo(() => mockQuests.filter((q) => q.type === filter), [filter]);
+  const quests = useMemo(() => all.filter((q) => q.type === filter), [all, filter]);
 
   return (
     <View style={styles.root}>
