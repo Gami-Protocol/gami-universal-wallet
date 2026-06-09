@@ -1,7 +1,12 @@
 import Constants from 'expo-constants';
 import { XPEventInput, RewardDecisionInput, DashboardSyncEvent } from './types';
 
-export const GAMI_API_URL = process.env.EXPO_PUBLIC_API_URL || Constants.expoConfig?.extra?.apiUrl || 'http://localhost:3000';
+export const GAMI_API_URL =
+  process.env.EXPO_PUBLIC_API_URL ||
+  process.env.EXPO_PUBLIC_API_BASE_URL ||
+  Constants.expoConfig?.extra?.API_URL ||
+  Constants.expoConfig?.extra?.apiUrl ||
+  'http://localhost:3000';
 
 async function request<T>(path: string, options?: RequestInit): Promise<T> {
   const res = await fetch(`${GAMI_API_URL}${path}`, {

@@ -56,6 +56,16 @@ npm run eas:build:production:android
 
 The `production` profile in `eas.json` is configured with `distribution: "store"` and `channel: "production"` for app-store ready builds.
 
+### TestFlight preflight checks
+
+- iOS bundle identifier resolves to `com.gamiprotocol.wallet` for `production` and `testflight` profiles.
+- `EXPO_PUBLIC_API_URL` is set to the target backend URL (`staging` for testflight, `production` for production).
+- Firebase and Google Sign-In iOS variables are set in CI/EAS:
+  - `GOOGLE_SERVICES_FILE_IOS`
+  - `EXPO_PUBLIC_GOOGLE_REVERSED_CLIENT_ID`
+  - `EXPO_PUBLIC_GOOGLE_IOS_CLIENT_ID`
+- `EXPO_PUBLIC_PRIVY_APP_ID` is set for the target environment.
+
 ## 📱 Features
 
 ### Splash Screen

@@ -6,9 +6,12 @@ import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { GAMI, FONTS, BrutalBox, Title, Label, ChevronLeftIcon, ArrowIcon } from '@/ui';
 import { useProfileStore } from '@/store/profileStore';
-import { useWallet, shortAddress } from '@/features/wallet/localWallet';
+import { useWallet, shortAddress, clearWalletSession } from '@/features/wallet/localWallet';
 import { useSettingsStore, type BoolSetting, type NovaPersonality } from '@/store/settingsStore';
 import { authenticate } from '@/features/auth/biometrics';
+import { clearSessionToken } from '@/features/gami/authService';
+import { useAuthStore } from '@/utils/auth/store';
+import { usePrivy } from '@/utils/privy';
 
 const NOVA_CYCLE: NovaPersonality[] = ['Hype', 'Chill', 'Pro'];
 const ONBOARDING_COMPLETED_KEY = '@onboarding_completed';
@@ -26,6 +29,8 @@ export default function SettingsScreen() {
   const router = useRouter();
   const { handle } = useProfileStore();
   const { address } = useWallet();
+  const setAuth = useAuthStore((state) => state.setAuth);
+  const { logout } = usePrivy();
   const s = useSettingsStore();
 
   const toggleFaceId = async () => {
@@ -42,10 +47,16 @@ export default function SettingsScreen() {
   };
 
   const signOut = async () => {
-    try {
-      await AsyncStorage.removeItem(ONBOARDING_COMPLETED_KEY);
-    } catch {
-      // non-fatal
+    const results = await Promise.allSettled([
+      AsyncStorage.removeItem(ONBOARDING_COMPLETED_KEY),
+      clearSessionToken(),
+      clearWalletSession(),
+      setAuth(null),
+      logout(),
+    ]);
+    const failedOps = results.filter((result) => result.status === 'rejected');
+    if (failedOps.length > 0) {
+      console.warn(`Sign out cleanup had ${failedOps.length} failure(s).`);
     }
     router.replace('/onboarding');
   };

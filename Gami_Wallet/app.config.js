@@ -15,6 +15,8 @@ export default ({ config }) => {
     'development';
   const IS_PRODUCTION = ENV === 'production';
   const IS_TESTNET = ['testnet', 'staging', 'testflight', 'preview'].includes(ENV);
+  const GOOGLE_REVERSED_CLIENT_ID = process.env.EXPO_PUBLIC_GOOGLE_REVERSED_CLIENT_ID;
+  const IOS_GOOGLE_SERVICES_FILE = process.env.GOOGLE_SERVICES_FILE_IOS;
 
   // TestFlight distributes the production App Store record, so a `testflight`
   // build shares the production app identity (display name + bundle id /
@@ -42,8 +44,19 @@ export default ({ config }) => {
     ios: {
       ...config.ios,
       supportsTablet: true,
+      ...(IOS_GOOGLE_SERVICES_FILE ? { googleServicesFile: IOS_GOOGLE_SERVICES_FILE } : {}),
       infoPlist: {
+        ...(config.ios?.infoPlist || {}),
         ITSAppUsesNonExemptEncryption: false,
+        ...(GOOGLE_REVERSED_CLIENT_ID
+          ? {
+              CFBundleURLTypes: [
+                {
+                  CFBundleURLSchemes: [GOOGLE_REVERSED_CLIENT_ID],
+                },
+              ],
+            }
+          : {}),
       },
       bundleIdentifier: USES_PROD_IDENTITY ? APP_ID : `${APP_ID}.${ENV}`,
       associatedDomains: [
@@ -140,6 +153,7 @@ export default ({ config }) => {
       
       // Privy Authentication
       PRIVY_APP_ID: process.env.EXPO_PUBLIC_PRIVY_APP_ID,
+      GOOGLE_REVERSED_CLIENT_ID: process.env.EXPO_PUBLIC_GOOGLE_REVERSED_CLIENT_ID,
       
       // API Configuration
       API_URL: process.env.EXPO_PUBLIC_API_URL || (
