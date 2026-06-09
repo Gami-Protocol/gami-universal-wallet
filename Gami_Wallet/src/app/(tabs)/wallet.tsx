@@ -20,8 +20,8 @@ import {
 } from '@/ui';
 import { useProfileStore, levelFromXp } from '@/store/profileStore';
 import { useWallet, shortAddress } from '@/features/wallet/localWallet';
-import { useTokens, useNfts } from '@/features/gami/useGamiData';
-import { useNativeBalance } from '@/features/wallet/useWalletData';
+import { useNfts } from '@/features/gami/useGamiData';
+import { useWalletTokens } from '@/features/wallet/useWalletData';
 import { useTxStore } from '@/store/txStore';
 
 const QUICK_ACTIONS = [
@@ -35,11 +35,9 @@ export default function WalletScreen() {
   const router = useRouter();
   const { xp } = useProfileStore();
   const { address, ready, init } = useWallet();
-  const { data: tokens } = useTokens(address ?? undefined);
+  const { tokens, totalUsd, isLive, pricesLive } = useWalletTokens();
   const { data: nfts } = useNfts(address ?? undefined);
-  const { balance: nativeBalance, symbol: nativeSymbol } = useNativeBalance();
   const txs = useTxStore((s) => s.txs);
-  const totalUsd = tokens.reduce((sum, t) => sum + t.usd, 0);
 
   useEffect(() => {
     if (!ready) init();
@@ -81,9 +79,11 @@ export default function WalletScreen() {
                 <BoltIcon size={13} color={GAMI.success} />
                 <Text style={styles.xpPillText}>{xp.toLocaleString()} XP · LVL {levelFromXp(xp)}</Text>
               </View>
-              {nativeBalance != null && (
+              {(isLive || pricesLive) && (
                 <View style={styles.xpPill}>
-                  <Text style={styles.xpPillText}>⛓ {Number(nativeBalance).toFixed(4)} {nativeSymbol}</Text>
+                  <Text style={[styles.xpPillText, { color: GAMI.cyan }]}>
+                    ● {isLive ? 'LIVE ON-CHAIN' : 'LIVE PRICES'}
+                  </Text>
                 </View>
               )}
             </View>
