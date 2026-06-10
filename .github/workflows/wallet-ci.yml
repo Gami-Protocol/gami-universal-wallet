@@ -15,6 +15,9 @@ on:
       - ".github/workflows/wallet-ci.yml"
       - ".nvmrc"
 
+permissions:
+  contents: read
+
 concurrency:
   group: wallet-ci-${{ github.ref }}
   cancel-in-progress: true
@@ -49,7 +52,9 @@ jobs:
       # (mostly in NeoUI components and gami feature code). Flipping
       # continue-on-error -> false should follow a cleanup PR.
       - name: TypeScript check (informational)
-        run: npx tsc --noEmit
+        # Calls Gami_Wallet/package.json's `typecheck` script so the
+        # canonical command and any future flag tweaks stay in one place.
+        run: npm run typecheck
         continue-on-error: true
 
       # Informational for now: surfaces duplicate native modules and missing
