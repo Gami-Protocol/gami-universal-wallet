@@ -1,0 +1,62 @@
+name: Wallet CI
+
+on:
+  pull_request:
+    paths:
+      - "Gami_Wallet/**"
+      - ".github/workflows/wallet-ci.yml"
+      - ".nvmrc"
+  push:
+    branches:
+      - main
+      - develop
+    paths:
+      - "Gami_Wallet/**"
+      - ".github/workflows/wallet-ci.yml"
+      - ".nvmrc"
+
+concurrency:
+  group: wallet-ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  install-and-check:
+    name: Frozen install + project checks
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        working-directory: Gami_Wallet
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          # Pinned in .nvmrc so local dev and CI agree on Node version.
+          node-version-file: .nvmrc
+          cache: npm
+          cache-dependency-path: Gami_Wallet/package-lock.json
+
+      # The single most valuable check in this workflow: `npm ci` is a frozen
+      # install that fails the moment package.json and package-lock.json drift,
+      # which is exactly the bug that broke five consecutive TestFlight runs
+      # before being fixed. Gating PRs on this means lockfile desync gets
+      # caught here, not in a (slow, paid) EAS build.
+      - name: Frozen install (npm ci)
+        run: npm ci
+
+      # Informational for now: the codebase has 39 pre-existing tsc errors
+      # (mostly in NeoUI components and gami feature code). Flipping
+      # continue-on-error -> false should follow a cleanup PR.
+      - name: TypeScript check (informational)
+        run: npx tsc --noEmit
+        continue-on-error: true
+
+      # Informational for now: surfaces duplicate native modules and missing
+      # peer dependencies. Currently fails on pre-existing duplicates
+      # (expo-location, react via expo-three, react-native-safe-area-context)
+      # and a missing peer (@react-native-community/netinfo). Will pass once
+      # Stage 2 dependency cleanup lands.
+      - name: Expo doctor (informational)
+        run: npx --yes expo-doctor
+        continue-on-error: true
