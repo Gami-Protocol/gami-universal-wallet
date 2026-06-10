@@ -7,6 +7,15 @@ ios/
 dist/
 build/
 
+# Non-npm lockfiles — EAS detects package managers by lockfile presence
+# (order: bun -> yarn -> npm -> pnpm). Stray lockfiles from other managers
+# silently override npm. Keep only package-lock.json at any package root.
+pnpm-lock.yaml
+yarn.lock
+bun.lockb
+bun.lock
+package-lock.json.bak
+
 # Next/React web projects within
 .next/
 .vercel/
