@@ -1,80 +1,53 @@
 {
-  "cli": {
-    "version": ">= 15.0.15",
-    "appVersionSource": "remote"
-  },
   "build": {
+    "base": {
+      "node": "12.13.0",
+      "yarn": "1.22.5",
+      "env": {
+        "EXAMPLE_ENV": "example value"
+      },
+      "android": {
+        "image": "default",
+        "env": {
+          "PLATFORM": "android"
+        }
+      },
+      "ios": {
+        "image": "latest",
+        "env": {
+          "PLATFORM": "ios"
+        }
+      }
+    },
     "development": {
+      "extends": "base",
       "developmentClient": true,
-      "distribution": "internal",
-      "channel": "development",
       "env": {
-        "APP_ENV": "development",
-        "EXPO_PUBLIC_APP_ENV": "development",
-        "EXPO_PUBLIC_API_URL": "https://api-dev.gamiprotocol.xyz",
-        "EXPO_PUBLIC_GAMI_CHAIN_ID": "7777777",
-        "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc-dev.gamiprotocol.xyz"
+        "ENVIRONMENT": "development"
+      },
+      "android": {
+        "distribution": "internal",
+        "withoutCredentials": true
+      },
+      "ios": {
+        "simulator": true
       }
     },
-    "testflight": {
-      "distribution": "store",
-      "channel": "testflight",
-      "autoIncrement": true,
-      "ios": {
-        "resourceClass": "m-medium"
-      },
+    "staging": {
+      "extends": "base",
       "env": {
-        "APP_ENV": "testflight",
-        "EXPO_PUBLIC_APP_ENV": "testflight",
-        "EXPO_PUBLIC_API_URL": "https://api-staging.gamiprotocol.xyz",
-        "EXPO_PUBLIC_GAMI_CHAIN_ID": "7777777",
-        "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc-staging.gamiprotocol.xyz"
-      }
-    },
-    "preview": {
-      "distribution": "internal",
-      "channel": "preview",
-      "ios": {
-        "simulator": false,
-        "resourceClass": "m-medium"
+        "ENVIRONMENT": "staging"
       },
+      "distribution": "internal",
       "android": {
         "buildType": "apk"
-      },
-      "env": {
-        "APP_ENV": "preview",
-        "EXPO_PUBLIC_APP_ENV": "preview",
-        "EXPO_PUBLIC_API_URL": "https://api-staging.gamiprotocol.xyz",
-        "EXPO_PUBLIC_GAMI_CHAIN_ID": "7777777",
-        "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc-staging.gamiprotocol.xyz"
       }
     },
     "production": {
-      "distribution": "store",
-      "autoIncrement": true,
-      "channel": "production",
-      "ios": {
-        "resourceClass": "m-medium"
-      },
-      "android": {
-        "buildType": "app-bundle"
-      },
+      "extends": "base",
       "env": {
-        "APP_ENV": "production",
-        "EXPO_PUBLIC_APP_ENV": "production",
-        "EXPO_PUBLIC_API_URL": "https://api.gamiprotocol.xyz",
-        "EXPO_PUBLIC_GAMI_CHAIN_ID": "7777777",
-        "EXPO_PUBLIC_GAMI_RPC_URL": "https://rpc.gamiprotocol.xyz"
+        "ENVIRONMENT": "production"
       }
-    }
-  },
-  "submit": {
-    "testflight": {
-      "ios": {}
-    },
-    "production": {
-      "ios": {},
-      "android": {}
     }
   }
 }
