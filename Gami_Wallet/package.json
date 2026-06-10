@@ -120,5 +120,8 @@
       "@shopify/react-native-skia": "2.2.12"
     }
   },
+  "engines": {
+    "node": ">=20.19.0 <21"
+  },
   "private": true
 }
